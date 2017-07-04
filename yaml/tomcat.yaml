@@ -50,3 +50,4 @@ spec:
     protocol: TCP
   selector:
     run: my-tomcat
+#
