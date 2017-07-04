@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: HorizaontalPodAutoscaler
+metadata:
+ name: dynamic
+ namespace: springcloud-test
+spec:
+ scaleTargetRef:
+   apiVersion: v1
+   kind: ReplicationController
+   name: dynamic
+ minReplicas: 1
+ maxrReplicas: 3
+ targetCPUUtilizationPercentage: 50

@@ -1,0 +1,29 @@
+apiVersion: v1
+items:
+- apiVersion: autoscaling/v1
+  kind: HorizontalPodAutoscaler
+  metadata:
+#    creationTimestamp: 2017-06-22T10:27:48Z
+    name: my-nginx
+    namespace: default
+#    resourceVersion: "38104"
+#    selfLink: /apis/autoscaling/v1/namespaces/default/horizontalpodautoscalers/my-nginx
+#    uid: 70755426-5735-11e7-a78c-000c2998d34a
+  spec:
+    maxReplicas: 6
+    minReplicas: 2
+    scaleTargetRef:
+      apiVersion: extensions/v1beta1
+      kind: Deployment
+      name: my-nginx
+    targetCPUUtilizationPercentage: 10
+#  status:
+#    currentCPUUtilizationPercentage: 0
+#    currentReplicas: 4
+#    desiredReplicas: 4
+#    lastScaleTime: 2017-06-23T05:30:25Z
+kind: List
+metadata: {}
+resourceVersion: ""
+selfLink: ""
+

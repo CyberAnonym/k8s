@@ -1,0 +1,68 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: eureka
+  labels:
+    name: eureka
+  namespace: springcloud-test
+spec:
+  replicas: 2
+  template: 
+    metadata:
+      labels:
+        run: eureka
+    spec:
+      containers:
+      - name: eureka
+        resources:
+          limits:
+            cpu: 400m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        env:
+        - name: JAVA
+          value: "/data/sprintcloud_sm/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms128m"
+        - name: PARAMETER2
+          value: "-Xmx256m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/data/springcloud/com.shenmintech.eureka.server-0.0.1-SNAPSHOT.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/eureka:5.0.3.01
+        ports:
+        - containerPort: 8761
+#          hostPort: 8761
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /data/sprintcloud_sm
+#          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /data2/k8springcloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smt-eureka
+  labels:
+    run: smt-eureka
+  namespace: springcloud-test
+spec:
+  type: NodePort
+  ports:
+  - port: 8761
+    targetPort: 8761
+    nodePort: 30001
+    protocol: TCP
+  selector:
+    run: eureka
+#  clusterIP: 10.107.105.14

@@ -1,0 +1,99 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: dynamic
+  labels:
+    name: dynamic
+  namespace: springcloud-test
+spec:
+  replicas: 2
+##
+  minReadySeconds: 30 
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+##
+  template: 
+    metadata:
+      labels:
+        run: dynamic
+    spec:
+##
+      terminationGracePeriodSeconds: 30
+##
+      containers:
+      - name: dynamic
+        resources:
+          limits:
+            cpu: 400m
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 512Mi
+        env:
+        - name: JAVA
+          value: "/data/sprintcloud_sm/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms256m"
+        - name: PARAMETER2
+          value: "-Xmx512m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/data/springcloud/com.shenmintech.dynamic-0.0.1-SNAPSHOT.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/dynamic:5.0.3.01
+        ports:
+        - containerPort: 9000
+#          hostPort: 9000
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /data/sprintcloud_sm
+#          readOnly: true
+##
+        livenessProbe:
+          httpGet:
+            path: /info
+            port: 9000
+            scheme: HTTP
+          initialDelaySeconds: 600
+          timeoutSeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 2
+        readinessProbe:
+          httpGet:
+            path: /info
+            port: 9000
+            scheme: HTTP
+          initialDelaySeconds: 600
+          timeoutSeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 2
+##
+      volumes:
+      - name: java
+        hostPath:
+          path: /data2/k8springcloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smt-dynamic
+  labels:
+    run: smt-dynamic
+  namespace: springcloud-test
+spec:
+  type: NodePort
+  ports:
+  - port: 9000
+    targetPort: 9000
+    nodePort: 30007
+    protocol: TCP
+  selector:
+    run: dynamic

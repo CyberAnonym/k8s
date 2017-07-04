@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: filesystem
+  labels:
+    name: filesystem
+  namespace: springcloud-test
+spec:
+  replicas: 1
+  template: 
+    metadata:
+      labels:
+        run: filesystem
+    spec:
+      containers:
+      - name: filesystem
+        resources:
+          limits:
+            cpu: 600m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        env:
+        - name: JAVA
+          value: "/data/sprintcloud_sm/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms128m"
+        - name: PARAMETER2
+          value: "-Xmx256m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/data/springcloud/com.shenmintech.filesystem-0.0.1-SNAPSHOT.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/filesystem:5.0.3.01
+        ports:
+        - containerPort: 8001
+#          hostPort: 8001
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /data/sprintcloud_sm
+#          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /data2/k8springcloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smt-filesystem
+  labels:
+    run: smt-filesystem
+  namespace: springcloud-test
+spec:
+  type: NodePort
+  ports:
+  - port: 8001
+    targetPort: 8001
+    nodePort: 30006
+    protocol: TCP
+  selector:
+    run: filesystem

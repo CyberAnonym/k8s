@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: registry
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: registry
+    spec:
+      nodeName: test2.shenmin.com
+      containers:
+      - name: registry
+        resources:
+          limits:
+            cpu: 2
+            memory: 200Mi
+          requests:
+            cpu: 0.5
+            memory: 100Mi
+        image: registry:2
+        ports:
+        - containerPort: 5000
+          hostPort: 5000
+          protocol: TCP
+          name: registry-port
+        volumeMounts:
+        - name: registry
+          mountPath: /var/lib/registry
+          readOnly: false
+        - name: registry-config
+          mountPath: /etc/docker/registry
+          readOnly: true
+      volumes:
+      - name: registry
+        hostPath:
+          path: /data/registry
+      - name: registry-config
+        hostPath:
+          path: /docker_config/registry/

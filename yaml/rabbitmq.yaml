@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: rabbitmq
+    spec:
+#      nodeName: test2.shenmin.com
+      containers:
+      - name: rabbitmq
+        resources:
+          limits:
+            cpu: 1
+            memory: 200Mi
+          requests:
+            cpu: 0.5
+            memory: 100Mi
+        image: test2.shenmin.com:5000/test-env-rabbitmq:latest
+        ports:
+        - containerPort: 5672
+#          hostPort: 5000
+          protocol: TCP
+          name: rabbitmq-port
+        command: [ "/config_rabbitmq.sh" ]
+#        volumeMounts:
+#        - name: registry
+#          mountPath: /var/lib/registry
+#          readOnly: false
+#      volumes:
+#      - name: registry
+#        hostPath:
+#          path: /data/registry
+#
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    run: rabbitmq
+  namespace: 
+spec:
+#  type: NodePort
+  ports:
+  - port: 5672
+    targetPort: 5672
+#    nodePort: 30001
+    protocol: TCP
+  selector:
+    run: rabbitmq

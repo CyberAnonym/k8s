@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: message
+  labels:
+    name: message
+  namespace: springcloud-test
+spec:
+  replicas: 1
+  template: 
+    metadata:
+      labels:
+        run: message
+    spec:
+      containers:
+      - name: message
+        resources:
+          limits:
+            cpu: 600m
+            memory: 256Mi
+          requests:
+            cpu: 200m
+            memory: 128Mi
+        env:
+        - name: JAVA
+          value: "/data/sprintcloud_sm/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms128m"
+        - name: PARAMETER2
+          value: "-Xmx256m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/data/springcloud/message-template.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/message:5.0.3.01
+        ports:
+        - containerPort: 5030
+#          hostPort: 5030
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /data/sprintcloud_sm
+#          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /data2/k8springcloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smt-message
+  labels:
+    run: smt-message
+  namespace: springcloud-test
+spec:
+  type: NodePort
+  ports:
+  - port: 5030
+    targetPort: 5030
+    nodePort: 30010
+    protocol: TCP
+  selector:
+    run: message

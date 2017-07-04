@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: zuul
+  labels:
+    name: zuul
+  namespace: springcloud-test
+spec:
+  replicas: 2
+  template: 
+    metadata:
+      labels:
+        run: zuul
+    spec:
+      containers:
+      - name: zuul
+        resources:
+          limits:
+            cpu: 600m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        env:
+        - name: JAVA
+          value: "/data/sprintcloud_sm/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms128m"
+        - name: PARAMETER2
+          value: "-Xmx256m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/data/springcloud/com.shenmintech.zuul-0.0.1-SNAPSHOT.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/zuul:5.0.3.01
+        ports:
+        - containerPort: 5556
+#          hostPort: 5556
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /data/sprintcloud_sm
+#          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /data2/k8springcloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smt-zuul
+  labels:
+    run: smt-zuul
+  namespace: springcloud-test
+spec:
+  type: NodePort
+  ports:
+  - port: 5556
+    targetPort: 5556
+    nodePort: 30004
+    name: zuul-http
+    protocol: TCP
+  - port: 5557
+    targetPort: 5557
+    nodePort: 30005
+    name: zuul-https
+    protocol: TCP
+  selector:
+    run: zuul

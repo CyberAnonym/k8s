@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: food
+  labels:
+    name: food
+  namespace: springcloud-test
+spec:
+  replicas: 1
+  template: 
+    metadata:
+      labels:
+        run: food
+    spec:
+      containers:
+      - name: food
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 512Mi
+          requests:
+            cpu: 1000m
+            memory: 512Mi
+        env:
+        - name: JAVA
+          value: "/data/sprintcloud_sm/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms256m"
+        - name: PARAMETER2
+          value: "-Xmx512m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/data/springcloud/food-template.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/food:5.0.3.01
+        ports:
+        - containerPort: 6020
+#          hostPort: 6020
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /data/sprintcloud_sm
+#          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /data2/k8springcloud
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smt-food
+  labels:
+    run: smt-food
+  namespace: springcloud-test
+spec:
+  type: NodePort
+  ports:
+  - port: 6020
+    targetPort: 6020
+    nodePort: 30009
+    protocol: TCP
+  selector:
+    run: food

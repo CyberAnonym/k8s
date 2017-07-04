@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+  name: configcenter
+  labels:
+    name: configcenter
+  namespace: cbppro-test
+spec:
+  replicas: 2
+  template: 
+    metadata:
+      labels:
+        run: configcenter
+    spec:
+      containers:
+      - name: configcenter
+        resources:
+          limits:
+            cpu: 2
+            memory: 1Gi
+          requests:
+            cpu: 1
+            memory: 500Mi
+        env:
+        - name: JAVA
+          value: "/opt/jdk1.8.0_101/bin/java"
+        - name: PARAMETER1
+          value: "-Xms128m"
+        - name: PARAMETER2
+          value: "-Xmx512m"
+        - name: PARAMETER3
+          value: "-jar"
+        - name: FILENAME
+          value: "/cbppro/configserver.jar"
+        - name: PARAMETER4
+          value: "--spring.profiles.active=test1"
+        image: test2.shenmin.com:5000/configcenter:1.2
+        ports:
+        - containerPort: 5555
+#          hostPort: 8761
+        command: ["$(JAVA)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)", "$(PARAMETER3)", "$(FILENAME)", "$(PARAMETER4)"]
+        volumeMounts:
+        - name: java
+          mountPath: /opt/jdk1.8.0_101
+          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /opt/jdk1.8.0_101
