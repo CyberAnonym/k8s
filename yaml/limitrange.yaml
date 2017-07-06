@@ -34,7 +34,7 @@ spec: #下面指定各种参数配置
     min: #设置最小值
       cpu: 200m
       memory: 16Mi
-    maxLimitRequestRatio: #最大于最小的比例
+    maxLimitRequestRatio: #最大与最小的比例
       cpu: 3
       memory: 2
     type: Container #为谁设置，这里表示上面这一阶段的内容都是为Container设置。
