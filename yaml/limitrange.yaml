@@ -17,7 +17,7 @@ spec:
     type: Pod
 
   - default:
-      cpu: 1000m
+      cpu: 1100m #如果创建pod的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。
       memory: 200Mi
     defaultRequest:
       cpu: 500m
