@@ -3,9 +3,15 @@ kind: LimitRange #创建的是什么内容。
 metadata: #基本信息
   name: mylimits #叫什么名字。
   namespace: names1 #在那个namespace创建。
-spec:
+spec: #下面指定各种参数配置
   limits: #这里设置要限制的值。
-  - max: #设置最大值
+  - default:  # 如果创建pod的时候没有设置资源限制，则使用下面的资源限制的配置。
+      cpu: 1000m #如果创建pod的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。这个值必须不能大于上面limits里面 max的值，也就是不能大于最大值否则会报错。
+      memory: 200Mi #设置默认的最大可用内存，200Mi代表最大可用200MiB内存。
+    defaultRequest: #设置默认的request
+      cpu: 200m #设置默认最低需求cpu100m，这个值必须不能低于上面设置的最低cpu的大小。
+      memory: 100Mi #设置默认最低需求100Mi的内存。
+    max: #设置最大值
       cpu: "1" #这个namespace里的pod，单个pod最大不能使用超过1G的内存。
       memory: 300Mi #单个pod多不能使用超过300MiB的内存。
     min: #设置最小值
@@ -14,21 +20,21 @@ spec:
     maxLimitRequestRatio: #request的值和最大值的比例，超过下面设置的比例就不能允许创建。比如，如果设置了最大cpu是1000m，request是200m，那么这个比例就是5,那么如果这个我们在下面设置的是4，那么pod就无法被创建。
       cpu: 5 #最小值cpu和最大cpu的比例不能超过这个值。
       memory: 3 #最小内存和最大内存比例不能超过这个值。
-    type: Pod
+    type: Pod #指定这些限制配置给谁，这里表示配置给pod
 
-  - default:  # 如果创建pod的时候没有设置资源限制，则使用下面的资源限制的配置。
-      cpu: 1000m #如果创建pod的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。这个值必须不能大于上面limits里面 max的值，也就是不能大于最大值否则会报错。
+  - default:  # 如果创建Container的时候没有设置资源限制，则使用下面的资源限制的配置。
+      cpu: 1000m #如果创建Container的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。这个值必须不能大于上面limits里面 max的值，也就是不能大于最大值否则会报错。
       memory: 200Mi #设置默认的最大可用内存，200Mi代表最大可用200MiB内存。
     defaultRequest: #设置默认的request
       cpu: 200m #设置默认最低需求cpu100m，这个值必须不能低于上面设置的最低cpu的大小。
       memory: 100Mi #设置默认最低需求100Mi的内存。
- #   max:
- #     cpu: "2"
- #     memory: 1Gi
- #   min:
- #     cpu: 200m
- #     memory: 16Mi
- #   maxLimitRequestRatio:
- #     cpu: 3
- #     memory: 2
-    type: Container
+    max: #设置最大值
+      cpu: "2"
+      memory: 1Gi
+    min: #设置最小值
+      cpu: 200m
+      memory: 16Mi
+    maxLimitRequestRatio: #最大于最小的比例
+      cpu: 3
+      memory: 2
+    type: Container #为谁设置，这里表示上面这一阶段的内容都是为Container设置。
