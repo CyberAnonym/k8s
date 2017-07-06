@@ -6,8 +6,8 @@ metadata:
 spec: 
   limits: 
   - max: 
-      cpu: "1" 
-      memory: 300Mi 
+      cpu: "300m" 
+      memory: 20Mi 
     min: 
       cpu: 200m
       memory: 16Mi 
@@ -17,16 +17,16 @@ spec:
     type: Pod 
 
   - default:  
-      cpu: 1000m 
-      memory: 200Mi 
+      cpu: 300m 
+      memory: 20Mi 
     defaultRequest: 
-      cpu: 200m 
-      memory: 100Mi
+      cpu: 50m 
+      memory: 5Mi
     max:
-      cpu: "2"
-      memory: 1Gi
+      cpu: "400"
+      memory: 50Mi
     min: 
-      cpu: 200m
+      cpu: 40m
       memory: 16Mi
     maxLimitRequestRatio:
       cpu: 5
