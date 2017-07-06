@@ -6,22 +6,22 @@ metadata:
 spec:
   limits:
   - max:
-      cpu: "1"
-      memory: 300Mi
+      cpu: "1" #这个namespace里的pod，单个pod最大不能使用超过1G的内存。
+      memory: 300Mi #单个pod多不能使用超过300MiB的内存。
     min:
-      cpu: 200m
-      memory: 16Mi
+      cpu: 200m #设置最小为其准备200m的cpu资源
+      memory: 16Mi #设置最小为准备16Mi的内存资源。
     maxLimitRequestRatio:
       cpu: 5
       memory: 3
     type: Pod
 
-  - default:
-      cpu: 1100m #如果创建pod的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。
-      memory: 200Mi
-    defaultRequest:
-      cpu: 500m
-      memory: 100Mi
+  - default:  #如果创建pod的时候没有设置资源限制，则使用下面的资源限制的配置。
+      cpu: 1000m #如果创建pod的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。这个值必须不能大于上面limits里面 max的值，也就是不能大于最大值否则会报错。
+      memory: 200Mi #设置默认的最大可用内存，200Mi代表最大可用200MiB内存。
+    defaultRequest: #设置默认的request
+      cpu: 100m #设置默认最低需求cpu100m。
+      memory: 100Mi #设置默认最低需求100Mi的内存。
     max:
       cpu: "2"
       memory: 1Gi
