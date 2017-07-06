@@ -5,11 +5,11 @@ metadata:
   namespace: names1
 spec:
   hard:
-    cpu: "20"
-    memory: 1Gi
+    cpu: "1"
+    memory: 500Mi
     persistentvolumeclaims: "10"
     pods: "10"
     replicationcontrollers: "20"
     resourcequotas: "1"
     secrets: "10"
-    services: "5"
+    services: "3"
