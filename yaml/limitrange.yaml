@@ -12,7 +12,7 @@ spec:
       cpu: 200m #设置最小为其准备200m的cpu资源
       memory: 16Mi #设置最小为准备16Mi的内存资源。
     maxLimitRequestRatio:
-      cpu: 5
+      cpu: 4
       memory: 3
     type: Pod
 
@@ -22,13 +22,13 @@ spec:
     defaultRequest: #设置默认的request
       cpu: 200m #设置默认最低需求cpu100m，这个值必须不能低于上面设置的最低cpu的大小。
       memory: 100Mi #设置默认最低需求100Mi的内存。
-    max:
-      cpu: "2"
-      memory: 1Gi
-    min:
-      cpu: 200m
-      memory: 16Mi
-    maxLimitRequestRatio:
-      cpu: 3
-      memory: 2
+ #   max:
+ #     cpu: "2"
+ #     memory: 1Gi
+ #   min:
+ #     cpu: 200m
+ #     memory: 16Mi
+ #   maxLimitRequestRatio:
+ #     cpu: 3
+ #     memory: 2
     type: Container
