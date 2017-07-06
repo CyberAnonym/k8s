@@ -12,8 +12,8 @@ spec:
       cpu: 200m #设置最小为其准备200m的cpu资源
       memory: 16Mi #设置最小为准备16Mi的内存资源。
     maxLimitRequestRatio: #request的值和最大值的比例，超过下面设置的比例就不能允许创建。比如，如果设置了最大cpu是1000m，request是200m，那么这个比例就是5,那么如果这个我们在下面设置的是4，那么pod就无法被创建。
-      cpu: 5
-      memory: 3
+      cpu: 4 #最小值cpu和最大cpu的比例不能超过这个值。
+      memory: 3 #最小内存和最大内存比例不能超过这个值。
     type: Pod
 
   - default:  #如果创建pod的时候没有设置资源限制，则使用下面的资源限制的配置。
