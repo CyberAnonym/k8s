@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: alpha-nginx
+  namespace: names1
   labels:
     run: alpha-nginx
 spec:
