@@ -34,4 +34,3 @@ spec:
       - name: java
         hostPath:
           path: /root/jdk1.8.0_101
-~                                    
