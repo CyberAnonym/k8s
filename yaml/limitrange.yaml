@@ -1,22 +1,22 @@
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: mylimits
-  namespace: names1
+apiVersion: v1  #使用的版本号是什么
+kind: LimitRange #创建的是什么内容。
+metadata: #基本信息
+  name: mylimits #叫什么名字。
+  namespace: names1 #在那个namespace创建。
 spec:
-  limits:
-  - max:
+  limits: #这里设置要限制的值。
+  - max: #设置最大值
       cpu: "1" #这个namespace里的pod，单个pod最大不能使用超过1G的内存。
       memory: 300Mi #单个pod多不能使用超过300MiB的内存。
-    min:
+    min: #设置最小值
       cpu: 200m #设置最小为其准备200m的cpu资源
       memory: 16Mi #设置最小为准备16Mi的内存资源。
     maxLimitRequestRatio: #request的值和最大值的比例，超过下面设置的比例就不能允许创建。比如，如果设置了最大cpu是1000m，request是200m，那么这个比例就是5,那么如果这个我们在下面设置的是4，那么pod就无法被创建。
-      cpu: 4 #最小值cpu和最大cpu的比例不能超过这个值。
+      cpu: 5 #最小值cpu和最大cpu的比例不能超过这个值。
       memory: 3 #最小内存和最大内存比例不能超过这个值。
     type: Pod
 
-  - default:  #如果创建pod的时候没有设置资源限制，则使用下面的资源限制的配置。
+  - default:  # 如果创建pod的时候没有设置资源限制，则使用下面的资源限制的配置。
       cpu: 1000m #如果创建pod的时候没有设置最大使用多大cpu，则设置这里设置的值，这里我们设置的1000m，也就是1个cpu的百分之百。这个值必须不能大于上面limits里面 max的值，也就是不能大于最大值否则会报错。
       memory: 200Mi #设置默认的最大可用内存，200Mi代表最大可用200MiB内存。
     defaultRequest: #设置默认的request
