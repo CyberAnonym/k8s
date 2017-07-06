@@ -12,7 +12,7 @@ spec:
       cpu: 200m
       memory: 16Mi 
     maxLimitRequestRatio: 
-      cpu: 5 
+      cpu: 10 
       memory: 3 
     type: Pod 
 
@@ -21,14 +21,14 @@ spec:
       memory: 20Mi 
     defaultRequest: 
       cpu: 50m 
-      memory: 5Mi
+      memory: 8Mi
     max:
-      cpu: "400"
+      cpu: "400m"
       memory: 50Mi
     min: 
       cpu: 40m
-      memory: 16Mi
+      memory: 6Mi
     maxLimitRequestRatio:
-      cpu: 5
+      cpu: 10
       memory: 2
     type: Container 
