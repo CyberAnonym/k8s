@@ -5,6 +5,7 @@ metadata:
   labels:
     run: alpha-nginx
 spec:
+  type: nodePort
   ports:
   - port: 80
     protocol: TCP
