@@ -13,7 +13,7 @@ spec:
       memory: 16Mi
     maxLimitRequestRatio:
       cpu: 5
-      memory: 500Mi
+      memory: 600Mi
     type: Pod
 
   - default:
