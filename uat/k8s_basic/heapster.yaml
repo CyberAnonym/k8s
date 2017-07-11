@@ -43,5 +43,4 @@ spec:
   - port: 80
     targetPort: 8082
   selector:
-    k8s-app: heapster
-~                     
+    k8s-app: heapster                 
