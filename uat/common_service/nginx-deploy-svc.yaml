@@ -16,6 +16,13 @@ spec:
     spec:
       containers:
       - name: nginx
+        resources:
+          limits:
+            cpu: 600m
+            memory: 600Mi
+          requests:
+            cpu: 0.2
+            memory: 100Mi
         image: reg.shenmintech.cn/nginx:1.0
         ports:
         - containerPort: 80
