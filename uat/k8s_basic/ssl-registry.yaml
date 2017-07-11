@@ -1,0 +1,74 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: registry-ssl
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: registry-ssl
+    spec:
+      nodeName: uat2
+      containers:
+      - name: registry-ssl
+        resources:
+          limits:
+            cpu: 2
+            memory: 200Mi
+          requests:
+            cpu: 0.5
+            memory: 100Mi
+        image: registry:2
+        env:
+        - name: REGISTRY_AUTH
+          value: "htpasswd"
+        - name: REGISTRY_AUTH_HTPASSWD_REALM
+          value: "Registry Realm"
+        - name: REGISTRY_AUTH_HTPASSWD_PATH
+          value: "/auth/htpasswd"
+        - name: REGISTRY_HTTP_TLS_CERTIFICATE
+          value: "/certs/reg.shenmintech.cn.crt"
+        - name: REGISTRY_HTTP_TLS_KEY
+          value: "/certs/reg.shenmintech.cn.key"
+        ports:
+        - containerPort: 5000
+#          hostPort: 5000
+          protocol: TCP
+          name: registry-port
+        volumeMounts:
+        - name: registry
+          mountPath: /var/lib/registry
+          readOnly: false
+        - name: registry-certs
+          mountPath: /certs
+          readOnly: true
+        - name: registry-auth
+          mountPath: /auth
+          readOnly: true
+      volumes:
+      - name: registry
+        hostPath:
+          path: /data/registry
+      - name: registry-certs
+        hostPath:
+          path: /data/docker_config/registry-cert/
+      - name: registry-auth
+        hostPath:
+          path: /data/docker_config/registry-auth/
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-ssl
+  labels:
+    run: registry-ssl
+spec:
+  ports:
+  - port: 443
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    run: registry-ssl
+  clusterIP: 172.18.155.5
