@@ -5,7 +5,7 @@ metadata:
 #  namespace: kube-system
   labels:
     name: nginx
-    version: 1.0
+    version: '1.0'
 spec:
   replicas: 2
   template:
