@@ -39,11 +39,17 @@ spec:
         volumeMounts:
         - name: java
           mountPath: /jdk1.8.0_101
-#          readOnly: true
+          readOnly: true
+        - name: hosts
+          mountPath: /etc/hosts
+          readOnly: true
       imagePullSecrets:
       - name: regsecret
       volumes:
       - name: java
         hostPath:
           path: /opt/jdk1.8.0_101
+      - name: hosts
+        hostPath:
+          path: /etc/hosts
 
