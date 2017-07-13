@@ -30,9 +30,9 @@ spec:
           value: "-f"
         - name: PARAMETER2
           value: "/logstash-2.4.1/sendout.conf"
-        image: test2.shenmin.com:5000/eureka:5.0.3.01
-        ports:
-        - containerPort: 8761
+        image: reg.shenmintech.cn/logstash2.4:v1.1
+#        ports:
+#        - containerPort: 8761
 #          hostPort: 8761
         command: ["$(LOGSTASH)"]
         args: ["$(PARAMETER1)", "$(PARAMETER2)"]
