@@ -31,8 +31,6 @@ spec:
         - name: PARAMETER2
           value: "/logstash-2.4.1/sendout.conf"
         image: reg.shenmintech.cn/logstash2.4:v1.1
-      imagePullSecrets:
-      - name: regsecret
 #        ports:
 #        - containerPort: 8761
 #          hostPort: 8761
@@ -42,6 +40,8 @@ spec:
         - name: java
           mountPath: /jdk1.8.0_101
 #          readOnly: true
+      imagePullSecrets:
+      - name: regsecret
       volumes:
       - name: java
         hostPath:
