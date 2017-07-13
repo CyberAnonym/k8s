@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: logstash_send
+  labels:
+    name: logstash_send
+  namespace: elk
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        elk: logstash_send
+    spec:
+      containers:
+      - name: logstash_send
+#        resources:
+#          limits:
+#            cpu: 400m
+#            memory: 500Mi
+#          requests:
+#            cpu: 200m
+#            memory: 256Mi
+        env:
+        - name: JAVA_HOME
+          value: "/jdk1.8.0_101"
+        - name: LOGSTASH
+          value: "/logstash-2.4.1/bin/logstash"
+        - name: PARAMETER1
+          value: "-f"
+        - name: PARAMETER2
+          value: "/logstash-2.4.1/sendout.conf"
+        image: test2.shenmin.com:5000/eureka:5.0.3.01
+        ports:
+        - containerPort: 8761
+#          hostPort: 8761
+        command: ["$(LOGSTASH)"]
+        args: ["$(PARAMETER1)", "$(PARAMETER2)"]
+        volumeMounts:
+        - name: java
+          mountPath: /jdk1.8.0_101
+#          readOnly: true
+      volumes:
+      - name: java
+        hostPath:
+          path: /opt/jdk1.8.0_101
+
