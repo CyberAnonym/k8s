@@ -1,19 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: logstash_send
+  name: logstash2
   labels:
-    name: logstash_send
+    name: logstash2
   namespace: elk
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        elk: logstash_send
+        elk: logstash2
     spec:
       containers:
-      - name: logstash_send
+      - name: logstash2
 #        resources:
 #          limits:
 #            cpu: 400m
