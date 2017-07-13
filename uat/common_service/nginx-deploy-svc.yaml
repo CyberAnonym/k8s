@@ -24,6 +24,7 @@ spec:
             cpu: 0.2
             memory: 100Mi
         image: reg.shenmintech.cn/nginx:1.0
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
 ---
