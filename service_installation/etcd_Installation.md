@@ -3,8 +3,8 @@
 export ETCD_NAME=u1.shenmin.com  
 export INTERNAL_IP=192.168.2.31  
 #### 创建相关目录  
-sudo mkdir -p /var/lib/etcd<br />
-cat > etcd.service <<EOF  
+sudo mkdir -p /var/lib/etcd </br>
+cat > etcd.service <<EOF  
 [Unit]  
 Description=Etcd Server  
 After=network.target  
