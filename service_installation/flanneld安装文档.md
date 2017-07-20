@@ -12,3 +12,25 @@ root@u1:~# ll /opt/bin/flanneld </br>
 /opt/bin/flanneld --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" --iface=192.168.2.31 --ip-masq -etcd-cafile=/etc/kubernetes/ssl/ca.pem </br>
 
 这样也可以启动成功。（注意启动的命令后面不要加空格）
+
+'''
+[Unit]
+Description=Flanneld overlay address etcd agent
+After=network.target
+After=network-online.target
+Wants=network-online.target
+After=etcd.service
+Before=docker.service
+
+[Service]
+Type=notify
+ExecStart=/opt/bin/flanneld \
+  --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \
+  --iface=192.168.2.31 \
+  --ip-masq \
+  --etcd-cafile=/etc/kubernetes/ssl/ca.pem
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+'''
