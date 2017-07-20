@@ -66,4 +66,17 @@ $ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 将两个 kubeconfig 文件分发到所有 Node 机器的 /etc/kubernetes/ 目录
 $ cp bootstrap.kubeconfig kube-proxy.kubeconfig /etc/kubernetes/
 
+root@u1:/samba/packages/linux/docker_images/config# ll
+total 6144
+drwxr-xr-x+ 2 99 99    0 Jul 20 19:24 ./
+drwx------+ 6 99 99    0 Jul 19 14:27 ../
+-rw-r--r--+ 1 99 99 1710 Jul 20 19:23 apiserver
+-rw-------+ 1 99 99 2174 Jul 19 18:17 bootstrap.kubeconfig
+-rw-r--r--+ 1 99 99  733 Jul 19 18:10 config
+-rw-r--r--+ 1 99 99  934 Jul 20 19:24 kubelet
+-rw-------+ 1 99 99 6284 Jul 19 20:13 kube-proxy.kubeconfig
+-rw-r--r--+ 1 99 99   84 Jul 19 18:09 token.csv
+root@u1:/samba/packages/linux/docker_images/config# for i in u1 u2 u3;do scp *  $i:/etc/kubernetes/ ';done
+
+
 ```
