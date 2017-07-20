@@ -1,4 +1,5 @@
 # etcd服务器集群安装文档
+参考：http://rootsongjc.github.io/blogs/kubernetes-etcd-ha-config/
 #### 定义服务器环境
 export ETCD_NAME=u1.shenmin.com  
 export INTERNAL_IP=192.168.2.31  
