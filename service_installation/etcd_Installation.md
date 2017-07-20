@@ -1,5 +1,5 @@
 # etcd服务器集群安装文档
-export ETCD_NAME=u1.shenmin.com
+export ETCD_NAME=u1.shenmin.com  
 export INTERNAL_IP=192.168.2.31
 sudo mkdir -p /var/lib/etcd
 mkdir -p /var/lib/etcd/
