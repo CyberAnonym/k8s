@@ -144,4 +144,6 @@ cp *.pem /etc/kubernetes/ssl
 
 查看验证证书
 openssl x509  -noout -text -in  kubernetes.pem
+for i in u1 u2 u3;do ssh  $i 'mkdir -p /etc/kubernetes/ssl';done
+for i in u1 u2 u3;do scp *.pem  $i:/etc/kubernetes/ssl;done
 ```
