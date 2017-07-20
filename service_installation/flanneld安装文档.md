@@ -35,3 +35,8 @@ Restart=on-failure</br>
 
 [Install]</br>
 WantedBy=multi-user.target</br>
+
+然后启动flannel。</br>
+systemctl daemon-reload  </br>
+systemctl start flanneld.service  </br>
+
