@@ -26,10 +26,10 @@ Before=docker.service</br>
 
 [Service]</br>
 Type=notify</br>
-ExecStart=/opt/bin/flanneld \</br>
+ExecStart=/opt/bin/flanneld \ </br>
   --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \ </br>
-  --iface=192.168.2.31 \</br>
-  --ip-masq \</br>
+  --iface=192.168.2.31 \ </br>
+  --ip-masq \ </br>
   --etcd-cafile=/etc/kubernetes/ssl/ca.pem</br>
 Restart=on-failure</br>
 
