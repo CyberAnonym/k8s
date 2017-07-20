@@ -14,7 +14,7 @@ root@u1:~# ll /opt/bin/flanneld </br>
 这样也可以启动成功。（注意启动的命令后面不要加空格）
 
 这里我们用systemd来管理flanneld， </br>
-
+```
 vim /lib/systemd/system/flanneld.service</br>
 [Unit]</br>
 Description=Flanneld overlay address etcd agent</br>
@@ -40,12 +40,5 @@ WantedBy=multi-user.target</br>
 然后启动flannel。</br>
 systemctl daemon-reload  </br>
 systemctl start flanneld.service  </br>
-
-
-
 ```
-sdaf
-s  ada
-  ff
 
-```
