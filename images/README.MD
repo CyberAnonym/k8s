@@ -1,1 +1,1 @@
-# Store image file.
+# Store image files.
