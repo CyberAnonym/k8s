@@ -15,30 +15,30 @@ root@u1:~# ll /opt/bin/flanneld </br>
 
 这里我们用systemd来管理flanneld， </br>
 ```
-vim /lib/systemd/system/flanneld.service</br>
-[Unit]</br>
-Description=Flanneld overlay address etcd agent</br>
-After=network.target</br>
-After=network-online.target</br>
-Wants=network-online.target</br>
-After=etcd.service</br>
-Before=docker.service</br>
+vim /lib/systemd/system/flanneld.service
+[Unit]
+Description=Flanneld overlay address etcd agent
+After=network.target
+After=network-online.target
+Wants=network-online.target
+After=etcd.service
+Before=docker.service
 
-[Service]</br>
-Type=notify</br>
-ExecStart=/opt/bin/flanneld \ </br>
-  --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \ </br>
-  --iface=192.168.2.31 \ </br>
-   --etcd-cafile=/etc/kubernetes/ssl/ca.pem \ </br>
-  --ip-masq</br>
+[Service]
+Type=notify
+ExecStart=/opt/bin/flanneld \
+  --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \ 
+  --iface=192.168.2.31 \ 
+   --etcd-cafile=/etc/kubernetes/ssl/ca.pem \
+  --ip-masq
 
-Restart=on-failure</br>
+Restart=on-failure
 
-[Install]</br>
-WantedBy=multi-user.target</br>
+[Install]
+WantedBy=multi-user.target
 
-然后启动flannel。</br>
-systemctl daemon-reload  </br>
-systemctl start flanneld.service  </br>
+然后启动flannel。
+systemctl daemon-reload
+systemctl start flanneld.service 
 ```
 
