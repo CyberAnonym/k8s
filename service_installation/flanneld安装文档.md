@@ -41,3 +41,10 @@ WantedBy=multi-user.target</br>
 systemctl daemon-reload  </br>
 systemctl start flanneld.service  </br>
 
+
+
+···
+  ok
+  yes
+as
+···
