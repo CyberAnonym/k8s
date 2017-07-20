@@ -1,8 +1,9 @@
 # etcd服务器集群安装文档
+#### 定义服务器环境
 export ETCD_NAME=u1.shenmin.com  
 export INTERNAL_IP=192.168.2.31  
-sudo mkdir -p /var/lib/etcd  
-mkdir -p /var/lib/etcd/  
+#### 创建相关目录  
+sudo mkdir -p /var/lib/etcd<br />
 cat > etcd.service <<EOF  
 [Unit]  
 Description=Etcd Server  
