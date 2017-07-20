@@ -11,4 +11,4 @@ root@u1:~# ll /opt/bin/flanneld </br>
 **如果要直接启动flannel，可以执行下面的命令。**   </br>
 /opt/bin/flanneld --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" --iface=192.168.2.31 --ip-masq -etcd-cafile=/etc/kubernetes/ssl/ca.pem </br>
 
-这样也可以启动成功。
+这样也可以启动成功。（注意启动的命令后面不要加空格）
