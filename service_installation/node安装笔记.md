@@ -148,7 +148,7 @@ WantedBy=multi-user.target
 ```
 # 4. kube-proxy
 
-####配置文件
+配置文件
 vim /etc/kubernetes/proxy 
 ```
 # kubernetes proxy config
