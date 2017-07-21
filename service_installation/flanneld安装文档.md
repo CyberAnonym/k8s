@@ -14,7 +14,6 @@ for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
 这里我们用systemd来管理flanneld， </br>
 ```
 IFACE=192.168.2.31
-vim /lib/systemd/system/flanneld.service
 cat > /lib/systemd/system/flanneld.service << EOF
 [Unit]
 Description=Flanneld overlay address etcd agent
