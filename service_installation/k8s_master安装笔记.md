@@ -222,3 +222,13 @@ systemctl start kube-controller-manager
 systemctl enable kube-scheduler
 systemctl start kube-scheduler
 ```
+#### 然后看一下各个组件的状态是否都是正常运行着了。
+```
+root@u1:~# kubectl get cs
+NAME                 STATUS    MESSAGE              ERROR
+scheduler            Healthy   ok                   
+controller-manager   Healthy   ok                   
+etcd-1               Healthy   {"health": "true"}   
+etcd-0               Healthy   {"health": "true"}   
+etcd-2               Healthy   {"health": "true"
+```
