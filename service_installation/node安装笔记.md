@@ -80,7 +80,7 @@ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 ```
 # 3. kubelet
 配置文件
-先配置公用的config
+先配置公用的config <br>
 vim /etc/kubernetes/config
 ```
 # logging to stderr means we get it in the systemd journal
