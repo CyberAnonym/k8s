@@ -95,8 +95,8 @@ KUBE_ALLOW_PRIV="--allow-privileged=true"
 # How the controller-manager, scheduler, and proxy find the apiserver
 KUBE_MASTER="--master=https://192.168.2.31:6443"
 ```
-然后是kubelet的config
-cat /etc/kubernetes/kubelet
+然后是kubelet的config<br>
+cat > /etc/kubernetes/kubelet <<EOF
 ```
 ###
 # kubernetes kubelet (minion) config
@@ -118,6 +118,7 @@ KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.
 
 # Add your own!
 KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
+EOF
 ```
 创建一个kubelet的目录
 mkdir -p /var/lib/kubelet
