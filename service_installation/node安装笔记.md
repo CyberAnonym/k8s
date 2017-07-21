@@ -139,6 +139,8 @@ WantedBy=multi-user.target
 # default config should be adequate
 # Add your own!
 KUBE_PROXY_ARGS="--proxy-mode=iptables --cluster-cidr=192.168.0.0/16"
+KUBE_HOSTNAME="--hostname-override=u2"
+
 
 vim /lib/systemd/system/kube-proxy.service 
 [Unit]
@@ -153,6 +155,7 @@ ExecStart=/opt/bin/kube-proxy \
         $KUBE_LOGTOSTDERR \
         $KUBE_LOG_LEVEL \
         $KUBE_MASTER \
+        $KUBE_HOSTNAME \
         $KUBE_PROXY_ARGS
 Restart=on-failure
 LimitNOFILE=65536
@@ -162,7 +165,7 @@ WantedBy=multi-user.target
 
 
 systemctl daemon-reload 
-
+systemctl start kubelet  #做完这一步要去master节点上授权（kubectl get csr， kubectl certificate approve xxxxx）。
 
 
 启动kubelet 
