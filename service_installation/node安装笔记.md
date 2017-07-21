@@ -138,8 +138,7 @@ WantedBy=multi-user.target
 # kubernetes proxy config
 # default config should be adequate
 # Add your own!
-KUBE_PROXY_ARGS="--proxy-mode=iptables --cluster-cidr=192.168.0.0/16"
-KUBE_HOSTNAME="--hostname-override=u2"
+KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
 
 
 vim /lib/systemd/system/kube-proxy.service 
