@@ -128,6 +128,16 @@ WantedBy=multi-user.target
 
 # 3.2 kube-controller-manager
 ```
+vim /etc/kubernetes/controller-manager 
+
+cat /etc/kubernetes/controller-manager 
+###
+# The following values are used to configure the kubernetes controller-manager
+
+# defaults from config and apiserver should be adequate
+
+# Add your own!
+KUBE_CONTROLLER_MANAGER_ARGS="--allocate-node-cidrs=true --cluster-cidr=192.168.0.0/16  --service-cluster-ip-range=172.18.0.0/16 --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem --root-ca-file=/etc/kubernetes/ssl/ca.pem"
 vim /lib/systemd/system/kube-controller-manager.service  
 [Unit]
 Description=Kubernetes Controller Manager
@@ -148,21 +158,24 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 ```
-### 配置文件
+
+
+
+### 3.3 kube-scheduler
+配置文件
 ```
-vim /etc/kubernetes/controller-manager 
-
-cat /etc/kubernetes/controller-manager 
+vim /etc/kubernetes/scheduler
+cat /etc/kubernetes/scheduler
 ###
-# The following values are used to configure the kubernetes controller-manager
+# kubernetes scheduler config
 
-# defaults from config and apiserver should be adequate
+# default config should be adequate
 
 # Add your own!
-KUBE_CONTROLLER_MANAGER_ARGS="--allocate-node-cidrs=true --cluster-cidr=192.168.0.0/16  --service-cluster-ip-range=172.18.0.0/16 --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem --root-ca-file=/etc/kubernetes/ssl/ca.pem"
-
-3.3 kube-scheduler
+KUBE_SCHEDULER_ARGS="--port=10251"
+```
 创建kube-scheduler.service
+```
 vim /lib/systemd/system/kube-scheduler.service
 cat /lib/systemd/system/kube-scheduler.service 
 [Unit]
@@ -184,20 +197,11 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 
-vim /etc/kubernetes/scheduler
+
 ```
 
-### 配置文件
-```
-cat /etc/kubernetes/scheduler
-###
-# kubernetes scheduler config
 
-# default config should be adequate
 
-# Add your own!
-KUBE_SCHEDULER_ARGS="--port=10251"
-```
 
 ### 4. 服务启动
 ```
