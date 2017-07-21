@@ -96,8 +96,8 @@ KUBE_ALLOW_PRIV="--allow-privileged=true"
 KUBE_MASTER="--master=https://192.168.2.31:6443"
 ```
 然后是kubelet的config<br>
-cat > /etc/kubernetes/kubelet <<EOF
 ```
+cat > /etc/kubernetes/kubelet <<EOF
 ###
 # kubernetes kubelet (minion) config
 
