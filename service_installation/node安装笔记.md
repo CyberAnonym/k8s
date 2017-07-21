@@ -1,4 +1,4 @@
-参考文档： http://blog.csdn.net/u010278923/article/details/71126246
+参考文档： http://blog.csdn.net/u010278923/article/details/71126246 <br>
 参考文档：http://rootsongjc.github.io/blogs/kubernetes-node-installation/
 
 (journalctl -u kubelet -f  #查看日志)
