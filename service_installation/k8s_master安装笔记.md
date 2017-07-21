@@ -128,7 +128,7 @@ WantedBy=multi-user.target
 
 # 3.2 kube-controller-manager
 ```
-vim lib/systemd/system/kube-controller-manager.service  
+vim /lib/systemd/system/kube-controller-manager.service  
 [Unit]
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
