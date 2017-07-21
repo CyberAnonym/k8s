@@ -2,6 +2,7 @@
 参考URL：http://blog.csdn.net/u010278923/article/details/71126246
 
 # 高可用master安装。
+[## Test](### 3.1 kube-apiserver)
 export KUBE_APISERVER="https://192.168.2.31:6443"
 
 kubectl config set-cluster kubernetes \
