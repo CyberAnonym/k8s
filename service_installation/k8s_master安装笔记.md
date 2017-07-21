@@ -2,7 +2,7 @@
 参考URL：http://blog.csdn.net/u010278923/article/details/71126246
 
 # 高可用master安装。
-1. [master 节点部署](#3.2kube-controller-manager)
+1. [master 节点部署](#3.2 kube-controller-manager)
 
 export KUBE_APISERVER="https://192.168.2.31:6443"
 
