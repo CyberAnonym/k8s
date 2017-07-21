@@ -76,6 +76,29 @@ kubectl config set-context default \
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 
 3. kubelet
+配置文件
+cat /etc/kubernetes/kubelet
+###
+# kubernetes kubelet (minion) config
+
+# The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)
+KUBELET_ADDRESS="--address=0.0.0.0"
+
+# The port for the info server to serve on
+# KUBELET_PORT="--port=10250"
+
+# You may leave this blank to use the actual hostname
+KUBELET_HOSTNAME="--hostname-override=u1"
+
+# location of the api-server
+#KUBELET_API_SERVER="--api-servers=http://192.168.2.31:8080"
+
+# pod infrastructure container
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
+
+# Add your own!
+KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
+
 服务文件
 vim /lib/systemd/system/kubelet.service
 [root@slave1 kubernetes]# cat /lib/systemd/system/kubelet.service
@@ -104,30 +127,17 @@ WantedBy=multi-user.target
 
 
 
-cat /etc/kubernetes/kubelet
-###
-# kubernetes kubelet (minion) config
-
-# The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)
-KUBELET_ADDRESS="--address=0.0.0.0"
-
-# The port for the info server to serve on
-# KUBELET_PORT="--port=10250"
-
-# You may leave this blank to use the actual hostname
-KUBELET_HOSTNAME="--hostname-override=u1"
-
-# location of the api-server
-#KUBELET_API_SERVER="--api-servers=http://192.168.2.31:8080"
-
-# pod infrastructure container
-KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
-
-# Add your own!
-KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
 
 
 4. kube-proxy
+
+配置文件
+#cat /etc/kubernetes/proxy 
+
+# kubernetes proxy config
+# default config should be adequate
+# Add your own!
+KUBE_PROXY_ARGS="--proxy-mode=iptables --cluster-cidr=192.168.0.0/16"
 
 vim /lib/systemd/system/kube-proxy.service 
 [Unit]
@@ -148,13 +158,7 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
-配置文件
-#cat /etc/kubernetes/proxy 
 
-# kubernetes proxy config
-# default config should be adequate
-# Add your own!
-KUBE_PROXY_ARGS="--proxy-mode=iptables --cluster-cidr=192.168.0.0/16"
 
 
 
