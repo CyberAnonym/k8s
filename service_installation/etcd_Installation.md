@@ -7,19 +7,19 @@ export INTERNAL_IP=192.168.2.31
 ```
 #### 创建相关目录  
 ```
-sudo mkdir -p /var/lib/etcd 
-cat > etcd.service <<EOF  
-[Unit]  
-Description=Etcd Server  
-After=network.target  
-After=network-online.target  
-Wants=network-online.target  
-Documentation=https://github.com/coreos  
+sudo mkdir -p /var/lib/etcd
+cat > etcd.service <<EOF
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/coreos
 
-[Service]  
-Type=notify  
-WorkingDirectory=/var/lib/etcd/   
-EnvironmentFile=-/etc/etcd/etcd.conf  
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+EnvironmentFile=-/etc/etcd/etcd.conf
 ExecStart=/opt/bin/etcd \\
   --name ${ETCD_NAME} \\
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \\
