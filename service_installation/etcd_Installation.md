@@ -50,7 +50,7 @@ systemctl start etcd
 
 检查ETCD是否正常运行  
 在任一 kubernetes master 机器上执行如下命令：  
-$ etcdctl \
+/opt/bin/etcdctl \
   --ca-file=/etc/kubernetes/ssl/ca.pem \  
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \  
   --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \  
