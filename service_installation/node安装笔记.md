@@ -100,6 +100,7 @@ KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.
 KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
 
 服务文件
+mkdir -p /var/lib/kubelet
 vim /lib/systemd/system/kubelet.service
 [root@slave1 kubernetes]# cat /lib/systemd/system/kubelet.service
 
@@ -159,6 +160,8 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 
+
+systemctl daemon-reload 
 
 
 
