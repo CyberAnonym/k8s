@@ -78,7 +78,7 @@ kubectl config set-context default \
 # 设置默认上下文
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 ```
-3. kubelet
+# 3. kubelet
 配置文件
 先配置公用的config
 vim /etc/kubernetes/config
