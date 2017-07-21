@@ -13,6 +13,7 @@ for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
 
 这里我们用systemd来管理flanneld， </br>
 ```
+IFACE=192.168.2.31
 vim /lib/systemd/system/flanneld.service
 [Unit]
 Description=Flanneld overlay address etcd agent
@@ -26,7 +27,7 @@ Before=docker.service
 Type=notify
 ExecStart=/opt/bin/flanneld \
   --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \
-  --iface=192.168.2.31 \
+  --iface=$IFACE \
    --etcd-cafile=/etc/kubernetes/ssl/ca.pem \
   --ip-masq
 
