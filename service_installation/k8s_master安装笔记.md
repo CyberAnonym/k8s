@@ -30,7 +30,7 @@ kubectl config set-context kubernetes \
 kubectl config use-context kubernetes
 
 这样就会在~/.kube/config 生成kubectl使用的kubeconfig文件。
-# 3.配置服务
+### 3.配置服务
 公共配置文件
 ```
 vim /etc/kubernetes/config
@@ -57,6 +57,37 @@ KUBE_ALLOW_PRIV="--allow-privileged=false"
 
 # How the controller-manager, scheduler, and proxy find the apiserver
 KUBE_MASTER="--master=http://192.168.2.31:8080"
+```
+### 配置文件
+```
+vim /etc/kubernetes/apiserver
+###
+## kubernetes system config
+##
+## The following values are used to configure the kube-apiserver
+##
+#
+## The address on the local server to listen to.
+#KUBE_API_ADDRESS="--insecure-bind-address=sz-pg-oam-docker-test-001.tendcloud.com"
+KUBE_API_ADDRESS="--advertise-address=192.168.2.31 --bind-address=192.168.2.31 --insecure-bind-address=0.0.0.0"
+#
+## The port on the local server to listen on.
+#KUBE_API_PORT="--port=8080"
+#
+## Port minions listen on
+#KUBELET_PORT="--kubelet-port=10250"
+#
+## Comma separated list of nodes in the etcd cluster
+KUBE_ETCD_SERVERS="--etcd-servers=https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379"
+#
+## Address range to use for services
+KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=172.18.0.0/16"
+#
+## default admission control policies
+KUBE_ADMISSION_CONTROL="--admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota"
+#
+## Add your own!
+KUBE_API_ARGS="--authorization-mode=RBAC --runtime-config=rbac.authorization.k8s.io/v1beta1 --kubelet-https=true --experimental-bootstrap-token-auth --token-auth-file=/etc/kubernetes/token.csv --service-node-port-range=30000-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem --etcd-cafile=/etc/kubernetes/ssl/ca.pem --etcd-certfile=/etc/kubernetes/ssl/kubernetes.pem --etcd-keyfile=/etc/kubernetes/ssl/kubernetes-key.pem --enable-swagger-ui=true --apiserver-count=3 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/lib/audit.log --event-ttl=1h"
 ```
 ### 3.1 kube-apiserver
 创建kube-apiserver.service
@@ -91,38 +122,7 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 ```
-# 配置文件
-```
-cat /etc/kubernetes/apiserver
-###
-# kubernetes system config
-#
-# The following values are used to configure the kube-apiserver
-#
 
-# The address on the local server to listen to.
-KUBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"
-
-# The port on the local server to listen on.
-#KUBE_API_PORT="--insecure-port=8080"
-
-# Port minions listen on
-# KUBELET_PORT="--kubelet-port=10250"
-
-# Comma separated list of nodes in the etcd cluster
-KUBE_ETCD_SERVERS="--etcd-servers=http://10.39.0.6:2379"
-
-# Address range to use for services
-KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=172.18.0.0/16"
-
-# default admission control policies
-KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,ServiceAccount,ResourceQuota"
-
-# Add your own!
-KUBE_API_ARGS="--authorization-mode=RBAC --runtime-config=rbac.authorization.k8s.io/v1beta1 --kubelet-https=true --experimental-bootstrap-token-auth  --service-node-port-range=30000-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem  --enable-swagger-ui=true  --event-ttl=1h"
-
-#上面API_ARGS里本来还有--token-auth-file=/etc/kubernetes/token.csv 这个参数，因为我们这边这个文件不存在，所以没放。
-```
 
 # 3.2 kube-controller-manager
 ```
