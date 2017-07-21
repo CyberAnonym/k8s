@@ -62,7 +62,7 @@ KUBE_MASTER="--master=http://192.168.2.31:8080"
 ```
 ### 配置文件
 ```
-vim /etc/kubernetes/apiserver
+**vim /etc/kubernetes/apiserver**
 ###
 ## kubernetes system config
 ##
