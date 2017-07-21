@@ -203,7 +203,14 @@ WantedBy=multi-user.target
 
 
 
-
+#### 解压软件到指定位置
+```
+tar xf /samba/packages/linux/kubernetesv1.6.2.tar.gz
+cd /tmp/kubernetes/server/
+tar xf kubernetes-server-linux-amd64.tar.gz
+cd kubernetes/server/bin/
+cp kube-apiserver kube-controller-manager kube-scheduler /opt/bin/
+for i in u1 u2 u3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
 ### 4. 服务启动
 ```
 systemctl daemon-reload
