@@ -42,7 +42,7 @@ LimitNOFILE=65536
 
 [Install]  
 WantedBy=multi-user.target  
-EOF  
+EOF
 
 mv etcd.service /lib/systemd/system/etcd.service  
 systemctl daemon-reload  
