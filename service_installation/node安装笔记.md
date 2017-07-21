@@ -2,16 +2,18 @@
 参考文档：http://rootsongjc.github.io/blogs/kubernetes-node-installation/
 
 (journalctl -u kubelet -f  #查看日志)
-```
-1. 角色绑定
+
+# 1. 角色绑定
+
 在master上面做角色绑定
+```
 kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+```
 
-
-2. 配置kubeconfig
+# 2. 配置kubeconfig
 Node 节点上的 kubelet、kube-proxy 需要通过 kubeconfig 获取master证书等信息。
 
-
+```
 
 (下面)
 【
@@ -75,10 +77,27 @@ kubectl config set-context default \
   --kubeconfig=kube-proxy.kubeconfig
 # 设置默认上下文
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
-
+```
 3. kubelet
 配置文件
+先配置公用的config
+vim /etc/kubernetes/config
+```
+# logging to stderr means we get it in the systemd journal
+KUBE_LOGTOSTDERR="--logtostderr=true"
+
+# journal message level, 0 is debug
+KUBE_LOG_LEVEL="--v=0"
+
+# Should this cluster be allowed to run privileged docker containers
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+
+# How the controller-manager, scheduler, and proxy find the apiserver
+KUBE_MASTER="--master=https://192.168.2.31:6443"
+```
+然后是kubelet的config
 cat /etc/kubernetes/kubelet
+```
 ###
 # kubernetes kubelet (minion) config
 
@@ -99,12 +118,12 @@ KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.
 
 # Add your own!
 KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
-
-服务文件
+```
+创建一个kubelet的目录
 mkdir -p /var/lib/kubelet
+服务文件
 vim /lib/systemd/system/kubelet.service
-[root@slave1 kubernetes]# cat /lib/systemd/system/kubelet.service
-
+```
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -126,23 +145,20 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+```
+# 4. kube-proxy
 
-
-
-
-
-4. kube-proxy
-
-配置文件
-#cat /etc/kubernetes/proxy 
-
+####配置文件
+vim /etc/kubernetes/proxy 
+```
 # kubernetes proxy config
 # default config should be adequate
 # Add your own!
 KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
-
+```
 
 vim /lib/systemd/system/kube-proxy.service 
+```
 [Unit]
 Description=Kubernetes Kube-Proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -162,16 +178,13 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
+```
+### 启动kubelet  <br>
+systemctl daemon-reload <br>
+systemctl start kubelet  #做完这一步要去master节点上授权（kubectl get csr， kubectl certificate approve xxxxx）。 <br>
 
 
-systemctl daemon-reload 
-systemctl start kubelet  #做完这一步要去master节点上授权（kubectl get csr， kubectl certificate approve xxxxx）。
-
-
-启动kubelet 
-测试的时候，直接使用命令也可以，使用如下命令。
-/opt/bin/kubelet --logtostderr=true --v=0 --address=192.168.2.31 --hostname-override=u1 --allow-privileged=tru --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl
-
+```
 然后并不能注册成功，因为还需要master授权CSR 
 查看未授权的 CSR 请求
 $ kubectl get csr
@@ -188,3 +201,6 @@ NAME        STATUS    AGE       VERSION
 
 然后kubelet 那边就注册成功了。
 ```
+
+然后启动kube-proxy<br>
+systemctl start kube-proxy <br>
