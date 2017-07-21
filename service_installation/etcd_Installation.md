@@ -27,7 +27,7 @@ ExecStart=/opt/bin/etcd \\
   --trusted-ca-file=/etc/kubernetes/ssl/ca.pem \\
   --peer-trusted-ca-file=/etc/kubernetes/ssl/ca.pem \\
   --initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\
-  --listen-peer-urls https://${INTERNAL_IP}:2380 \\\\  
+  --listen-peer-urls https://${INTERNAL_IP}:2380 \\
   --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
   --advertise-client-urls https://${INTERNAL_IP}:2379 \\
   --initial-cluster-token etcd-cluster-0 \\
