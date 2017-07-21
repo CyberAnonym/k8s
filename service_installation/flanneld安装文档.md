@@ -25,8 +25,8 @@ Before=docker.service
 [Service]
 Type=notify
 ExecStart=/opt/bin/flanneld \
-  --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \ 
-  --iface=192.168.2.31 \ 
+  --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \
+  --iface=192.168.2.31 \
    --etcd-cafile=/etc/kubernetes/ssl/ca.pem \
   --ip-masq
 
