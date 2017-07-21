@@ -23,8 +23,8 @@ EnvironmentFile=-/etc/etcd/etcd.conf
 ExecStart=/opt/bin/etcd \\
   --name ${ETCD_NAME} \\
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \\
-  --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \\ 
-  --peer-cert-file=/etc/kubernetes/ssl/kubernetes.pem \\ 
+  --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \\
+  --peer-cert-file=/etc/kubernetes/ssl/kubernetes.pem \\
   --peer-key-file=/etc/kubernetes/ssl/kubernetes-key.pem \\
   --trusted-ca-file=/etc/kubernetes/ssl/ca.pem \\
   --peer-trusted-ca-file=/etc/kubernetes/ssl/ca.pem \\
@@ -35,10 +35,10 @@ ExecStart=/opt/bin/etcd \\
   --initial-cluster-token etcd-cluster-0 \\
   --initial-cluster u1.shenmin.com=https://u1.shenmin.com:2380,u2.shenmin.com=https://u2.shenmin.com:2380,u3.shenmin.com=https://u3.shenmin.com:2380 \\
   --initial-cluster-state new \\
-  --data-dir=/var/lib/etcd  
-Restart=on-failure 
-RestartSec=5 
-LimitNOFILE=65536  
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
 
 [Install]  
 WantedBy=multi-user.target  
