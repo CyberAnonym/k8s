@@ -1,7 +1,7 @@
-```
-URL：http://blog.csdn.net/u010278923/article/details/71126246
 
-高可用master安装。
+参考URL：http://blog.csdn.net/u010278923/article/details/71126246
+
+# 高可用master安装。
 export KUBE_APISERVER="https://192.168.2.31:6443"
 
 kubectl config set-cluster kubernetes \
@@ -30,8 +30,9 @@ kubectl config set-context kubernetes \
 kubectl config use-context kubernetes
 
 这样就会在~/.kube/config 生成kubectl使用的kubeconfig文件。
-3.配置服务
+# 3.配置服务
 公共配置文件
+```
 vim /etc/kubernetes/config
 cat config 
 ###
@@ -56,9 +57,10 @@ KUBE_ALLOW_PRIV="--allow-privileged=false"
 
 # How the controller-manager, scheduler, and proxy find the apiserver
 KUBE_MASTER="--master=http://192.168.2.31:8080"
-
-3.1 kube-apiserver
+```
+### 3.1 kube-apiserver
 创建kube-apiserver.service
+```
 vim /lib/systemd/system/kube-apiserver.service 
 cat  /lib/systemd/system/kube-apiserver.service 
 [Unit]
@@ -88,8 +90,9 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
-
-配置文件
+```
+# 配置文件
+```
 cat /etc/kubernetes/apiserver
 ###
 # kubernetes system config
@@ -119,9 +122,10 @@ KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,NamespaceExists,L
 KUBE_API_ARGS="--authorization-mode=RBAC --runtime-config=rbac.authorization.k8s.io/v1beta1 --kubelet-https=true --experimental-bootstrap-token-auth  --service-node-port-range=30000-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem  --enable-swagger-ui=true  --event-ttl=1h"
 
 #上面API_ARGS里本来还有--token-auth-file=/etc/kubernetes/token.csv 这个参数，因为我们这边这个文件不存在，所以没放。
+```
 
-3.2 kube-controller-manager
-
+# 3.2 kube-controller-manager
+```
 vim lib/systemd/system/kube-controller-manager.service  
 [Unit]
 Description=Kubernetes Controller Manager
@@ -141,8 +145,9 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
-配置文件
-
+```
+### 配置文件
+```
 vim /etc/kubernetes/controller-manager 
 
 cat /etc/kubernetes/controller-manager 
@@ -178,9 +183,10 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 
 vim /etc/kubernetes/scheduler
+```
 
-
-配置文件
+### 配置文件
+```
 cat /etc/kubernetes/scheduler
 ###
 # kubernetes scheduler config
@@ -189,8 +195,10 @@ cat /etc/kubernetes/scheduler
 
 # Add your own!
 KUBE_SCHEDULER_ARGS="--port=10251"
+```
 
-4. 服务启动
+### 4. 服务启动
+```
 systemctl daemon-reload
 systemctl enable kube-apiserver
 systemctl start kube-apiserver
@@ -198,6 +206,4 @@ systemctl enable kube-controller-manager
 systemctl start kube-controller-manager
 systemctl enable kube-scheduler
 systemctl start kube-scheduler
-
-
 ```
