@@ -43,4 +43,6 @@ systemctl start flanneld.service
 ```
 
 然后我们需要让docker的网段与flanneld的一样，执行下面的命令。   
+```bash
 wget -q -O - https://raw.githubusercontent.com/AlvinWanCN/scripts/master/shell/k8s/syncFlannelToDocker.sh|bash
+```
