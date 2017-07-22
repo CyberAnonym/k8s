@@ -287,7 +287,7 @@ spec:
   restartPolicy: Always
 ```
 exec到容器内，验证
-
+```bash
 nslookup kubernetes
 Server:    10.254.0.3
 Address 1: 10.254.0.3 kube-dns.kube-system.svc.cluster.local
