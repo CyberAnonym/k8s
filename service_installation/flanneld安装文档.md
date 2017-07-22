@@ -1,7 +1,7 @@
 # flanneld的安装
 
 **这里我们已经下载了软件flannel-0.5.5-linux-amd64.tar.gz ，并解压得到了我们的flanneld 文件。</br>**
-```
+```bash
 tar xf /samba/packages/linux/flannel-v0.8.0-linux-amd64.tar.gz -C /tmp/
 cd /tmp/
 for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
@@ -12,7 +12,7 @@ for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
 这样也可以启动成功。（注意启动的命令后面不要加空格）
 
 这里我们用systemd来管理flanneld， </br>
-```
+```bash
 IFACE=192.168.2.31
 cat > /lib/systemd/system/flanneld.service << EOF
 [Unit]
