@@ -1,13 +1,14 @@
 本子来自： http://blog.csdn.net/u010278923/article/details/71152796
 
-```
-这个相对简单，直接修改yaml创建就可以 
+
+这个相对简单，直接修改yaml创建就可以 <br>
 直接看文件
 
 kubedns-cm.yaml
 
 configap配置文件
 
+```yaml
 # Copyright 2016 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,12 +81,12 @@ spec:
   - name: dns-tcp
     port: 53
     protocol: TCP
-
+```
 
 这个里面注意clusterIP和kubelet里面配置的保存一致即可
 
 kubedns-controller.yaml
-
+```yaml
 # Copyright 2016 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -257,19 +258,19 @@ spec:
             cpu: 10m
       dnsPolicy: Default  # Don't use cluster DNS.
       serviceAccountName: kube-dns
-
+```
 然后通过kubectl逐一创建就行，也可以放到一个目录下面，kubectl create -f .批量创建。
-
+```bash
 kubectl create -f kubedns-cm.yaml 
 kubectl create -f kubedns-sa.yaml 
 kubectl create -f kubedns-svc.yaml
 kubectl create -f kubedns-controller.yaml
-
+```
 4
 验证
 
 起一个pod通过dns验证
-
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -284,7 +285,7 @@ spec:
     imagePullPolicy: IfNotPresent
     name: busybox
   restartPolicy: Always
-
+```
 exec到容器内，验证
 
 nslookup kubernetes
