@@ -345,3 +345,51 @@ systemctl start etcd  
   --endpoint=https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379 \
   mk /coreos.com/network/config '{"Network":"192.168.0.0/16", "Backend": {"Type": "vxlan"}}'
 ```
+# 安装配置flanneld服务
+
+flannel的历史版本在这里 https://github.com/coreos/flannel/releases <br>
+这里我们下载的是0.8.0版本。<br>
+```bash
+ wget https://github.com/coreos/flannel/releases/download/v0.8.0/flannel-v0.8.0-linux-amd64.tar.gz
+ ```
+ - 解压包，并将flanneld传到指定的服务器指定目录
+ ```
+ tar xf flannel-v0.8.0-linux-amd64.tar.gz -C /tmp/
+ cd /tmp/
+for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
+```
+这里我们用systemd来管理flanneld， </br>
+```bash
+IFACE=192.168.2.31
+cat > /lib/systemd/system/flanneld.service << EOF
+[Unit]
+Description=Flanneld overlay address etcd agent
+After=network.target
+After=network-online.target
+Wants=network-online.target
+After=etcd.service
+Before=docker.service
+
+[Service]
+Type=notify
+ExecStart=/opt/bin/flanneld \\
+  --etcd-endpoints="https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379" \\
+  --iface=$IFACE \\
+   --etcd-cafile=/etc/kubernetes/ssl/ca.pem \\
+  --ip-masq
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+- 然后启动flannel。
+```bash
+systemctl daemon-reload
+systemctl start flanneld.service 
+```
+- 然后我们需要让docker的网段与flanneld的一样，执行下面的命令。
+```bash
+wget -q -O - https://raw.githubusercontent.com/AlvinWanCN/scripts/master/shell/k8s/syncFlannelToDocker.sh|bash
+```
