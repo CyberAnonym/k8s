@@ -12,9 +12,9 @@
 192.168.2.32 u2.shenmin.com u2
 192.168.2.33 u3.shenmin.com u3
 ```
-**master服务器信息**  
-Hostname: os1.shenmin.com  
-IP: 192.168.2.31  
+**master服务器信息** <br>
+Hostname: os1.shenmin.com<br>
+IP: 192.168.2.31<br>
 **node1服务器信息**  
 Hostname: os2.shenmin.com  
 IP: 192.168.2.32  
