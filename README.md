@@ -5,6 +5,9 @@
 5, [安装配置flanneld服务](#安装配置flanneld服务)  <br>
 6, [安装k8s master](#安装k8s的master)<br>
 7, [安装k8s node](#安装k8s的node)<br>
+8, [安装dns](#安装dns)
+9, [安装Heapster和dashboard](#安装Heapster和dashboard)
+10,[安装grafana](安装grafana)
 # 安装环境：  
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
@@ -16,7 +19,7 @@ cat /etc/hosts
 192.168.2.32 u2.shenmin.com u2
 192.168.2.33 u3.shenmin.com u3
 ```
-- 三台服务器系统版本都是ubuntu16.06。
+- 三台服务器系统版本都是ubuntu16.06。<br>
 **master服务器信息** <br>
 Hostname: os1.shenmin.com<br>
 IP: 192.168.2.31<br>
