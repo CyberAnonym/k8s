@@ -1,6 +1,6 @@
 ```
 
-参考地址：http://blog.csdn.net/u010278923/article/details/71126246
+参考地址：http://blog.csdn.net/u010278923/article/details/71082349
 安装kubernetes最麻烦的地方应该就是证书的认证，由于kubernetes1.6后加的RBAC，使得配置更加麻烦了，先是制作证书，如果你对openssl或者easyrsa熟悉的话，同理可以替换，先安装cfssl。
 wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod +x cfssl_linux-amd64
