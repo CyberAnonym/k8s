@@ -3,8 +3,9 @@
 3, [配置kubeconfig](#配置kubeconfig)  <br>
 4, [安装配置etcd服务](#安装etcd服务)<br>
 5, [安装配置flanneld服务](#安装配置flanneld服务)  <br>
-
-# 安装环境：  
+6, [安装k8s master](#安装k8s master（kube-apiserver kube-controller-manager kube-scheduler kube-proxy))<br>
+7, [安装k8s node](#安装k8s node)
+# 安装环境：  
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
 **三台服务器上都存在的配置**
@@ -396,8 +397,9 @@ wget -q -O - https://raw.githubusercontent.com/AlvinWanCN/scripts/master/shell/k
 # 安装k8s master（kube-apiserver kube-controller-manager kube-scheduler kube-proxy）
 - 编写配置文件
 - 公共配置文件<br>
-vim /etc/kubernetes/config<br>
+
 ```bash
+vim /etc/kubernetes/config
 ###
 # kubernetes system config
 #
@@ -421,9 +423,9 @@ KUBE_ALLOW_PRIV="--allow-privileged=false"
 # How the controller-manager, scheduler, and proxy find the apiserver
 KUBE_MASTER="--master=http://192.168.2.31:8080"
 ```
-- apiserver的配置文件
-vim /etc/kubernetes/apiserver<br>
+- kube-apiserver的配置文件
 ```bash
+vim /etc/kubernetes/apiserver
 ###
 ## kubernetes system config
 ##
@@ -452,6 +454,36 @@ KUBE_ADMISSION_CONTROL="--admission-control=ServiceAccount,NamespaceLifecycle,Na
 ## Add your own!
 KUBE_API_ARGS="--authorization-mode=RBAC --runtime-config=rbac.authorization.k8s.io/v1beta1 --kubelet-https=true --experimental-bootstrap-token-auth --token-auth-file=/etc/kubernetes/token.csv --service-node-port-range=30000-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem --etcd-cafile=/etc/kubernetes/ssl/ca.pem --etcd-certfile=/etc/kubernetes/ssl/kubernetes.pem --etcd-keyfile=/etc/kubernetes/ssl/kubernetes-key.pem --enable-swagger-ui=true --apiserver-count=3 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/lib/audit.log --event-ttl=1h"
 ```
+- kube-apiserver的启动文件
+```bash
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+After=etcd.service
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/apiserver
+User=root
+ExecStart=/opt/bin/kube-apiserver \
+        $KUBE_LOGTOSTDERR \
+        $KUBE_LOG_LEVEL \
+        $KUBE_ETCD_SERVERS \
+        $KUBE_API_ADDRESS \
+        $KUBE_API_PORT \
+        $KUBELET_PORT \
+        $KUBE_ALLOW_PRIV \
+        $KUBE_SERVICE_ADDRESSES \
+        $KUBE_ADMISSION_CONTROL \
+        $KUBE_API_ARGS
+Restart=on-failure
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
 - kube-controller-manager的配置文件
 ```bash
 vim /etc/kubernetes/controller-manager 
@@ -462,7 +494,10 @@ vim /etc/kubernetes/controller-manager
 
 # Add your own!
 KUBE_CONTROLLER_MANAGER_ARGS="--allocate-node-cidrs=true --cluster-cidr=192.168.0.0/16  --service-cluster-ip-range=172.18.0.0/16 --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem --root-ca-file=/etc/kubernetes/ssl/ca.pem"
-vim /lib/systemd/system/kube-controller-manager.service  
+```
+- kube-controller-manager的启动文件
+```bash
+vim /lib/systemd/system/kube-controller-manager.service 
 [Unit]
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -481,4 +516,204 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
+```
+- kube-scheduler的配置文件
+```bash
+vim /etc/kubernetes/scheduler
+###
+# kubernetes scheduler config
+
+# default config should be adequate
+
+# Add your own!
+KUBE_SCHEDULER_ARGS="--port=10251"
+```
+- kube-scheduler的启动文件
+```bash
+vim /lib/systemd/system/kube-scheduler.service
+[Unit]
+Description=Kubernetes Scheduler Plugin
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/scheduler
+User=root
+ExecStart=/usr/bin/kube-scheduler \
+        $KUBE_LOGTOSTDERR \
+        $KUBE_LOG_LEVEL \
+        $KUBE_MASTER \
+        $KUBE_SCHEDULER_ARGS
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
+- 下载并解压软件到指定位置
+#下载软件
+ ```
+ wget https://github.com/kubernetes/kubernetes/releases/download/v1.6.2/kubernetes.tar.gz
+ tar xf kubernetes.tar.gz
+./kubernetes/cluster/get-kube-binaries.sh
+y
+cd /tmp/kubernetes/server/
+tar xf kubernetes-server-linux-amd64.tar.gz
+cd kubernetes/server/bin/
+cp kube-apiserver kube-controller-manager kube-scheduler /opt/bin/
+for i in u1 u2 u3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
+```
+- 启动服务
+```
+systemctl daemon-reload
+systemctl enable kube-apiserver
+systemctl start kube-apiserver
+systemctl enable kube-controller-manager
+systemctl start kube-controller-manager
+systemctl enable kube-scheduler
+systemctl start kube-scheduler
+```
+- 确认各个组件的状态是否都是正常运行。
+```bash
+root@u1:~# kubectl get cs
+NAME                 STATUS    MESSAGE              ERROR
+scheduler            Healthy   ok                   
+controller-manager   Healthy   ok                   
+etcd-1               Healthy   {"health": "true"}   
+etcd-0               Healthy   {"health": "true"}   
+etcd-2               Healthy   {"health": "true"
+```
+# 安装node
+
+- 角色绑定
+#现在要去master上做角色绑定<br>
+```bash
+kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+```
+- 编写公共配置文件
+```bash
+vim /etc/kubernetes/config
+# logging to stderr means we get it in the systemd journal
+KUBE_LOGTOSTDERR="--logtostderr=true"
+
+# journal message level, 0 is debug
+KUBE_LOG_LEVEL="--v=0"
+
+# Should this cluster be allowed to run privileged docker containers
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+
+# How the controller-manager, scheduler, and proxy find the apiserver
+KUBE_MASTER="--master=https://192.168.2.31:6443"
+```
+- 编写kubelet的配置文件
+#不同的node上在IP和NAME上都写自己的。<br>
+```bash
+cat > /etc/kubernetes/kubelet <<EOF
+###
+# kubernetes kubelet (minion) config
+
+# The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)
+KUBELET_ADDRESS="--address=0.0.0.0"
+
+# The port for the info server to serve on
+# KUBELET_PORT="--port=10250"
+
+# You may leave this blank to use the actual hostname
+KUBELET_HOSTNAME="--hostname-override=u1"
+
+# location of the api-server
+#KUBELET_API_SERVER="--api-servers=http://192.168.2.31:8080"
+
+# pod infrastructure container
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
+
+# Add your own!
+KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
+EOF
+```
+- 创建一个kubelet的目录
+```bash
+mkdir -p /var/lib/kubelet
+```
+- 编写kubelet服务启动文件
+```bash
+vim /lib/systemd/system/kubelet.service
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStart=/opt/bin/kubelet \
+        $KUBE_LOGTOSTDERR \
+        $KUBE_LOG_LEVEL \
+        $KUBELET_ADDRESS \
+        $KUBELET_HOSTNAME \
+        $KUBE_ALLOW_PRIV \
+        $KUBELET_ARGS
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+- 编写kube-proxy的配置文件
+```bash
+vim /etc/kubernetes/proxy
+# kubernetes proxy config
+# default config should be adequate
+# Add your own!
+KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
+```
+- 编写kube-proxy启动文件
+```bash
+vim /lib/systemd/system/kube-proxy.service
+[Unit]
+Description=Kubernetes Kube-Proxy Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/proxy
+ExecStart=/opt/bin/kube-proxy \
+        $KUBE_LOGTOSTDERR \
+        $KUBE_LOG_LEVEL \
+        $KUBE_MASTER \
+        $KUBE_HOSTNAME \
+        $KUBE_PROXY_ARGS
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
+- 启动kubelet
+```bash
+systemctl daemon-reload
+systemctl start kubelet
+```
+- 做完上面的这一操作，要去maser上授权这个kubelet访问
+做完这一步要去master节点上授权<br>
+下面是示例<br>
+```bash
+$ kubectl get csr
+NAME        AGE       REQUESTOR           CONDITION
+csr-2b308   4m        kubelet-bootstrap   Pending
+$ kubectl get nodes
+No resources found.
+#通过 CSR 请求
+$ kubectl certificate approve csr-2b308
+certificatesigningrequest "csr-2b308" approved
+$ kubectl get nodes
+NAME        STATUS    AGE       VERSION
+10.64.3.7   Ready     49m       v1.6.1
+#然后kubelet 那边就注册成功了。
+```
+- 然后启动kube-proxy
+```bash
+systemctl start kube-proxy 
 ```
