@@ -1,14 +1,10 @@
-1, [安装环境](#安装环境)
+1, [安装环境](#安装环境)  
 2, [创建证书](#创建证书)
 
 # 安装环境：  
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
-**master服务器信息**  
-
-
-Hostname: os1.shenmin.com  
-IP: 192.168.2.31  
+**三台服务器上都存在的配置**
 ```bash
 #cat /etc/hosts
 127.0.0.1	localhost
@@ -16,27 +12,16 @@ IP: 192.168.2.31
 192.168.2.32 u2.shenmin.com u2
 192.168.2.33 u3.shenmin.com u3
 ```
+**master服务器信息**  
+Hostname: os1.shenmin.com  
+IP: 192.168.2.31  
 **node1服务器信息**  
 Hostname: os2.shenmin.com  
 IP: 192.168.2.32  
-```bash
-#cat /etc/hosts
-127.0.0.1	localhost
-192.168.2.31 u1.shenmin.com u1
-192.168.2.32 u2.shenmin.com u2
-192.168.2.33 u3.shenmin.com u3
-```
 **node2服务器信息**  
-
 Hostname: os3.shenmin.com  
 IP: 192.168.2.33  
-```bash
-#cat /etc/hosts
-127.0.0.1	localhost
-192.168.2.31 u1.shenmin.com u1
-192.168.2.32 u2.shenmin.com u2
-192.168.2.33 u3.shenmin.com u3
-```
+
 
 # 创建证书
 创建证书部分参考地址：http://blog.csdn.net/u010278923/article/details/71082349
