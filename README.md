@@ -8,7 +8,7 @@
 8, [安装dns](#安装dns)<br>
 9, [安装Heapster和dashboard](#安装Heapster和dashboard)<br>
 10,[安装grafana](#安装grafana)<br>
-# 安装环境：  
+# 安装环境：
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
 **三台服务器上都存在的配置**
@@ -185,7 +185,7 @@ vim kube-proxy-csr.json
 }
 ```
 **生成证书**<br>
-```
+```bash
 cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes  kube-proxy-csr.json | cfssljson -bare kube-proxy
 ```
 
@@ -236,8 +236,9 @@ kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
 ```
 - --embed-certs 为 true 时表示将 certificate-authority 证书写入到生成的 bootstrap.kubeconfig 文件中；
 - 设置客户端认证参数时没有指定秘钥和证书，后续由 kube-apiserver 自动生成；
-##### 创建Kube-Proxy Kubeconfig 文件
-```
+- 创建Kube-Proxy Kubeconfig 文件
+- 
+```bash
 export KUBE_APISERVER="https://192.168.2.31:6443"
 # 设置集群参数
  kubectl config set-cluster kubernetes \
@@ -258,37 +259,51 @@ kubectl config set-context default \
   --kubeconfig=kube-proxy.kubeconfig
 # 设置默认上下文
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
-  ```
+```
 - 设置集群参数和客户端认证参数时 --embed-certs 都为 true，这会将 certificate-authority、client-certificate 和 client-key 指向的证书文件内容写入到生成的 kube-proxy.kubeconfig 文件中；
 - kube-proxy.pem 证书中 CN 为 system:kube-proxy，kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；
 
-##### 分发 Kubeconfig 文件
+- 分发 Kubeconfig 文件
 将两个 kubeconfig 文件分发到所有 Node 机器的 /etc/kubernetes/ 目录<br>
+
+```bash
 for i in u1 u2 u3;do scp bootstrap.kubeconfig kube-proxy.kubeconfig token.csv $i:/etc/kubernetes/;done
+```
 # 安装etcd服务
 **下载etcd**
 etcd 的github地址：https://github.com/coreos/etcd/releases  
 [这里我们下载3.1.10版本](https://github.com/coreos/etcd/releases/download/v3.1.10/etcd-v3.1.10-linux-amd64.tar.gz)
 ```bash
 wget https://github.com/coreos/etcd/releases/download/v3.1.10/etcd-v3.1.10-linux-amd64.tar.gz
-#创建用于存放服务文件的的目录
+```
+- 创建用于存放服务文件的的目录
+- 
+```bash
 for i in u1 u2 u3;do ssh $i 'mkdir -p /opt/bin';done
-#解压etcd安装包到/tmp目录
+```
+- 解压etcd安装包到/tmp目录
+- 
+``` bash
 tar xf etcd-v3.1.10-linux-amd64.tar.gz -C /tmp/
-#将etcd的运行文件发到相应的服务器上去
+```
+- 将etcd的运行文件发到相应的服务器上去
+- 
+```bash
 for i in u1 u2 u3;do scp /tmp/etcd-v3.1.10-linux-amd64/etcd* $i:/opt/bin/;done
 ```
-##### 定义服务器环境
+- 定义服务器环境
 - 以下配置在三台服务器上都做，ETCD_NAME和IP分别写每台服务器自己的。
-```shell
+```bash
 export ETCD_NAME=u1.shenmin.com 
 export INTERNAL_IP=192.168.2.31  
 ```
-##### 创建相关目录  
+
+- 创建相关目录  
 ```bash
 sudo mkdir -p /var/lib/etcd
 ```
-##### 创建启动启动脚本
+- 创建启动启动脚本<br>
+
 ```bash
 cat > /lib/systemd/system/etcd.service  <<EOF
 [Unit]
@@ -327,11 +342,13 @@ WantedBy=multi-user.target
 EOF
 ```
 - 重新加载服务并启动
+- 
 ```bash
 systemctl daemon-reload
-systemctl start etcd  
+systemctl start etcd
 ```
 - 在三台服务器都配置、启动好了etcd之后，我们可以来检查一下ETCD是否正常运行。
+- 
 
 检查ETCD是否正常运行，在任一 kubernetes master 机器上执行如下命令：<br>
 ```bash
@@ -341,7 +358,8 @@ systemctl start etcd  
   --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
  --endpoint=https://u1.shenmin.com:2379  cluster-health
 ```
- - 接下来要为k8s提供服务，这里我们尝试为k8s创建一个目录 <br>
+- 接下来要为k8s提供服务，这里我们尝试为k8s创建一个目录 <br>
+- 
 ```bash
 /opt/bin/etcdctl \
   --ca-file=/etc/kubernetes/ssl/ca.pem \
@@ -356,14 +374,17 @@ flannel的历史版本在这里 https://github.com/coreos/flannel/releases <br>
 这里我们下载的是0.8.0版本。<br>
 ```bash
  wget https://github.com/coreos/flannel/releases/download/v0.8.0/flannel-v0.8.0-linux-amd64.tar.gz
- ```
- - 解压包，并将flanneld传到指定的服务器指定目录
- ```
- tar xf flannel-v0.8.0-linux-amd64.tar.gz -C /tmp/
- cd /tmp/
+```
+- 解压包，并将flanneld传到指定的服务器指定目录 <br>
+- 
+ 
+```bash
+tar xf flannel-v0.8.0-linux-amd64.tar.gz -C /tmp/
+cd /tmp/
 for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
 ```
 这里我们用systemd来管理flanneld， </br>
+
 ```bash
 IFACE=192.168.2.31
 cat > /lib/systemd/system/flanneld.service << EOF
@@ -390,6 +411,7 @@ WantedBy=multi-user.target
 EOF
 ```
 - 然后启动flannel。
+- 
 ```bash
 systemctl daemon-reload
 systemctl start flanneld.service 
@@ -428,6 +450,7 @@ KUBE_ALLOW_PRIV="--allow-privileged=false"
 KUBE_MASTER="--master=http://192.168.2.31:8080"
 ```
 - kube-apiserver的配置文件
+- 
 ```bash
 vim /etc/kubernetes/apiserver
 ###
@@ -459,6 +482,7 @@ KUBE_ADMISSION_CONTROL="--admission-control=ServiceAccount,NamespaceLifecycle,Na
 KUBE_API_ARGS="--authorization-mode=RBAC --runtime-config=rbac.authorization.k8s.io/v1beta1 --kubelet-https=true --experimental-bootstrap-token-auth --token-auth-file=/etc/kubernetes/token.csv --service-node-port-range=30000-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem --etcd-cafile=/etc/kubernetes/ssl/ca.pem --etcd-certfile=/etc/kubernetes/ssl/kubernetes.pem --etcd-keyfile=/etc/kubernetes/ssl/kubernetes-key.pem --enable-swagger-ui=true --apiserver-count=3 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/lib/audit.log --event-ttl=1h"
 ```
 - kube-apiserver的启动文件
+
 ```bash
 [Unit]
 Description=Kubernetes API Server
@@ -489,6 +513,8 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 ```
 - kube-controller-manager的配置文件
+- 
+
 ```bash
 vim /etc/kubernetes/controller-manager 
 ###
@@ -500,6 +526,7 @@ vim /etc/kubernetes/controller-manager
 KUBE_CONTROLLER_MANAGER_ARGS="--allocate-node-cidrs=true --cluster-cidr=192.168.0.0/16  --service-cluster-ip-range=172.18.0.0/16 --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem --root-ca-file=/etc/kubernetes/ssl/ca.pem"
 ```
 - kube-controller-manager的启动文件
+- 
 ```bash
 vim /lib/systemd/system/kube-controller-manager.service 
 [Unit]
@@ -522,6 +549,7 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 ```
 - kube-scheduler的配置文件
+- 
 ```bash
 vim /etc/kubernetes/scheduler
 ###
@@ -533,6 +561,8 @@ vim /etc/kubernetes/scheduler
 KUBE_SCHEDULER_ARGS="--port=10251"
 ```
 - kube-scheduler的启动文件
+- 
+
 ```bash
 vim /lib/systemd/system/kube-scheduler.service
 [Unit]
@@ -554,9 +584,10 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 ```
-- 下载并解压软件到指定位置
+- 下载并解压软件到指定位置<br>
 #下载软件
- ```
+
+ ```bash
  wget https://github.com/kubernetes/kubernetes/releases/download/v1.6.2/kubernetes.tar.gz
  tar xf kubernetes.tar.gz
 ./kubernetes/cluster/get-kube-binaries.sh
@@ -568,6 +599,7 @@ cp kube-apiserver kube-controller-manager kube-scheduler /opt/bin/
 for i in u1 u2 u3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
 ```
 - 启动服务
+- 
 ```
 systemctl daemon-reload
 systemctl enable kube-apiserver
@@ -578,6 +610,7 @@ systemctl enable kube-scheduler
 systemctl start kube-scheduler
 ```
 - 确认各个组件的状态是否都是正常运行。
+- 
 ```bash
 root@u1:~# kubectl get cs
 NAME                 STATUS    MESSAGE              ERROR
@@ -590,11 +623,14 @@ etcd-2               Healthy   {"health": "true"
 # 安装k8s的node
 
 - 角色绑定
+- 
 #现在要去master上做角色绑定<br>
+
 ```bash
 kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
 ```
 - 编写公共配置文件
+- 
 ```bash
 vim /etc/kubernetes/config
 # logging to stderr means we get it in the systemd journal
@@ -610,6 +646,7 @@ KUBE_ALLOW_PRIV="--allow-privileged=true"
 KUBE_MASTER="--master=https://192.168.2.31:6443"
 ```
 - 编写kubelet的配置文件
+- 
 #不同的node上在IP和NAME上都写自己的。<br>
 ```bash
 cat > /etc/kubernetes/kubelet <<EOF
@@ -636,10 +673,12 @@ KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experim
 EOF
 ```
 - 创建一个kubelet的目录
+- 
 ```bash
 mkdir -p /var/lib/kubelet
 ```
 - 编写kubelet服务启动文件
+- 
 ```bash
 vim /lib/systemd/system/kubelet.service
 [Unit]
@@ -665,6 +704,7 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 - 编写kube-proxy的配置文件
+- 
 ```bash
 vim /etc/kubernetes/proxy
 # kubernetes proxy config
@@ -673,6 +713,9 @@ vim /etc/kubernetes/proxy
 KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
 ```
 - 编写kube-proxy启动文件
+- 
+- 
+
 ```bash
 vim /lib/systemd/system/kube-proxy.service
 [Unit]
@@ -696,13 +739,16 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 ```
 - 启动kubelet
+- 
 ```bash
 systemctl daemon-reload
 systemctl start kubelet
 ```
 - 做完上面的这一操作，要去maser上授权这个kubelet访问
+- 
 做完这一步要去master节点上授权<br>
 下面是示例<br>
+
 ```bash
 $ kubectl get csr
 NAME        AGE       REQUESTOR           CONDITION
@@ -718,6 +764,7 @@ NAME        STATUS    AGE       VERSION
 #然后kubelet 那边就注册成功了。
 ```
 - 然后启动kube-proxy
+- 
 ```bash
 systemctl start kube-proxy 
 ```
