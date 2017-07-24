@@ -41,6 +41,7 @@ wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64
 chmod +x cfssl-certinfo_linux-amd64
 sudo mv cfssl-certinfo_linux-amd64 /usr/local/bin/cfssl-certinfo
 ```
+创建ca-config.json<br>
 vim ca-config.json
 ```json
 {
@@ -63,7 +64,7 @@ vim ca-config.json
 }
 
 ```
-创建ca-csr.json
+创建ca-csr.json<br>
 vim ca-csr.json
 ```json
 {
@@ -83,7 +84,7 @@ vim ca-csr.json
   ]
 }
 ```
-生产证书
+生成证书
 ```shell
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 ```
