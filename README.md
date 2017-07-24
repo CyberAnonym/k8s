@@ -16,6 +16,7 @@ cat /etc/hosts
 192.168.2.32 u2.shenmin.com u2
 192.168.2.33 u3.shenmin.com u3
 ```
+- 三台服务器系统版本都是ubuntu16.06。
 **master服务器信息** <br>
 Hostname: os1.shenmin.com<br>
 IP: 192.168.2.31<br>
