@@ -207,7 +207,7 @@ EOF
 ```bash
 cp token.csv /etc/kubernetes/
 ```
-创建 Kubelet Bootstrapping Kubeconfig 文件<br>
+##### 创建 Kubelet Bootstrapping Kubeconfig 文件<br>
 ```bash
 cd /etc/kubernetes
 export KUBE_APISERVER="https://192.168.2.31:6443
@@ -231,6 +231,35 @@ kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
 ```
 - --embed-certs 为 true 时表示将 certificate-authority 证书写入到生成的 bootstrap.kubeconfig 文件中；
 - 设置客户端认证参数时没有指定秘钥和证书，后续由 kube-apiserver 自动生成；
+##### 创建Kube-Proxy Kubeconfig 文件
+```
+export KUBE_APISERVER="https://192.168.2.31:6443"
+# 设置集群参数
+ kubectl config set-cluster kubernetes \
+  --certificate-authority=/etc/kubernetes/ssl/ca.pem \
+  --embed-certs=true \
+  --server=${KUBE_APISERVER} \
+  --kubeconfig=kube-proxy.kubeconfig
+# 设置客户端认证参数
+kubectl config set-credentials kube-proxy \
+  --client-certificate=/etc/kubernetes/ssl/kube-proxy.pem \
+  --client-key=/etc/kubernetes/ssl/kube-proxy-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kube-proxy.kubeconfig
+# 设置上下文参数
+kubectl config set-context default \
+  --cluster=kubernetes \
+  --user=kube-proxy \
+  --kubeconfig=kube-proxy.kubeconfig
+# 设置默认上下文
+kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+  ```
+- 设置集群参数和客户端认证参数时 --embed-certs 都为 true，这会将 certificate-authority、client-certificate 和 client-key 指向的证书文件内容写入到生成的 kube-proxy.kubeconfig 文件中；
+- kube-proxy.pem 证书中 CN 为 system:kube-proxy，kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 Role system:node-proxier 绑定，该 Role 授予了调用 kube-apiserver Proxy 相关 API 的权限；
+
+##### 分发 Kubeconfig 文件
+将两个 kubeconfig 文件分发到所有 Node 机器的 /etc/kubernetes/ 目录<br>
+for i in u1 u2 u3;do scp bootstrap.kubeconfig kube-proxy.kubeconfig token.csv $i:/etc/kubernetes/;done
 # 安装etcd服务
 **下载etcd**
 etcd 的github地址：https://github.com/coreos/etcd/releases  
@@ -244,3 +273,54 @@ tar xf etcd-v3.1.10-linux-amd64.tar.gz -C /tmp/
 #将etcd的运行文件发到相应的服务器上去
 for i in u1 u2 u3;do scp /tmp/etcd-v3.1.10-linux-amd64/etcd* $i:/opt/bin/;done
 
+##### 定义服务器环境
+```shell
+export ETCD_NAME=u1.shenmin.com 
+export INTERNAL_IP=192.168.2.31  
+```
+##### 创建相关目录  
+```bash
+sudo mkdir -p /var/lib/etcd
+```
+##### 创建启动启动脚本
+cat > /lib/systemd/system/etcd.service  <<EOF
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/coreos
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+EnvironmentFile=-/etc/etcd/etcd.conf
+ExecStart=/opt/bin/etcd \\
+  --name ${ETCD_NAME} \\
+  --cert-file=/etc/kubernetes/ssl/kubernetes.pem \\
+  --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \\
+  --peer-cert-file=/etc/kubernetes/ssl/kubernetes.pem \\
+  --peer-key-file=/etc/kubernetes/ssl/kubernetes-key.pem \\
+  --trusted-ca-file=/etc/kubernetes/ssl/ca.pem \\
+  --peer-trusted-ca-file=/etc/kubernetes/ssl/ca.pem \\
+  --initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\
+  --listen-peer-urls https://${INTERNAL_IP}:2380 \\
+  --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
+  --advertise-client-urls https://${INTERNAL_IP}:2379 \\
+  --initial-cluster-token etcd-cluster-0 \\
+  --initial-cluster u1.shenmin.com=https://u1.shenmin.com:2380,u2.shenmin.com=https://u2.shenmin.com:2380,u3.shenmin.com=https://u3.shenmin.com:2380 \\
+  --initial-cluster-state new \\
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]  
+WantedBy=multi-user.target  
+EOF
+```
+- 重新加载服务并启动
+```bash
+systemctl daemon-reload
+systemctl start etcd  
+bash
