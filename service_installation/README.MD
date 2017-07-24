@@ -2,7 +2,7 @@
 # 安装环境：  
 三台服务器，一台master，两台node  
 
-**master服务器信息**
+**master服务器信息**  
 hostname：os1.shenmin.com  
 ip:192.168.2.31  
 ```bash
