@@ -1,5 +1,5 @@
 1, [安装环境](#安装环境)  <br>
-2, [创建证书](#创建证书)  <br><br>
+2, [创建证书](#创建证书)  <br>
 3, [配置kubeconfig](#配置kubeconfig)  <br>
 4, [安装配置etcd服务](#安装配置etcd服务)<br>
 5, [安装配置flanneld服务](#安装配置flanneld服务)  <br>
