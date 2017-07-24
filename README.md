@@ -3,8 +3,8 @@
 3, [配置kubeconfig](#配置kubeconfig)  <br>
 4, [安装配置etcd服务](#安装etcd服务)<br>
 5, [安装配置flanneld服务](#安装配置flanneld服务)  <br>
-6, [安装k8s master](#安装k8s master)<br>
-7, [安装k8s node](#安装k8s node)<br>
+6, [安装k8s master](#安装k8s的master)<br>
+7, [安装k8s node](#安装k8s的node)<br>
 # 安装环境：  
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
@@ -394,7 +394,7 @@ systemctl start flanneld.service
 ```bash
 wget -q -O - https://raw.githubusercontent.com/AlvinWanCN/scripts/master/shell/k8s/syncFlannelToDocker.sh|bash
 ```
-# 安装k8s maste
+# 安装k8s的master
 - 编写配置文件
 - 公共配置文件<br>
 
@@ -583,7 +583,7 @@ etcd-1               Healthy   {"health": "true"}
 etcd-0               Healthy   {"health": "true"}   
 etcd-2               Healthy   {"health": "true"
 ```
-# 安装k8s node
+# 安装k8s的node
 
 - 角色绑定
 #现在要去master上做角色绑定<br>
