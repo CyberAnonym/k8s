@@ -1,7 +1,7 @@
 1, [安装环境](#安装环境)  <br>
 2, [创建证书](#创建证书)  <br>
 3, [配置kubeconfig](#配置kubeconfig)  <br>
-4, [安装配置etcd服务](#安装配置etcd服务)<br>
+4, [安装配置etcd服务](#安装etcd服务)<br>
 5, [安装配置flanneld服务](#安装配置flanneld服务)  <br>
 
 # 安装环境：  
@@ -192,7 +192,7 @@ for i in u1 u2 u3;do scp *.pem  $i:/etc/kubernetes/ssl;done
 查看验证证书
 openssl x509  -noout -text -in  kubernetes.pem
 
-# 创建kubeconfig文件
+# 配置kubeconfig
 创建 TLS Bootstrapping Token<br>
 Token auth file<br>
 Token可以是任意的包涵128 bit的字符串，可以使用安全的随机数发生器生成。<br>
@@ -274,6 +274,7 @@ tar xf etcd-v3.1.10-linux-amd64.tar.gz -C /tmp/
 for i in u1 u2 u3;do scp /tmp/etcd-v3.1.10-linux-amd64/etcd* $i:/opt/bin/;done
 ```
 ##### 定义服务器环境
+- 以下配置在三台服务器上都做，ETCD_NAME和IP分别写每台服务器自己的。
 ```shell
 export ETCD_NAME=u1.shenmin.com 
 export INTERNAL_IP=192.168.2.31  
@@ -324,4 +325,23 @@ EOF
 ```bash
 systemctl daemon-reload
 systemctl start etcd  
+```
+- 在三台服务器都配置、启动好了etcd之后，我们可以来检查一下ETCD是否正常运行。
+
+检查ETCD是否正常运行，在任一 kubernetes master 机器上执行如下命令：<br>
+```bash
+/opt/bin/etcdctl \
+  --ca-file=/etc/kubernetes/ssl/ca.pem \
+  --cert-file=/etc/kubernetes/ssl/kubernetes.pem \
+  --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
+ --endpoint=https://u1.shenmin.com:2379  cluster-health
+```
+ - 接下来要为k8s提供服务，这里我们尝试为k8s创建一个目录 <br>
+```bash
+/opt/bin/etcdctl \
+  --ca-file=/etc/kubernetes/ssl/ca.pem \
+  --cert-file=/etc/kubernetes/ssl/kubernetes.pem \
+  --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
+  --endpoint=https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379 \
+  mk /coreos.com/network/config '{"Network":"192.168.0.0/16", "Backend": {"Type": "vxlan"}}'
 ```
