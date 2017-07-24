@@ -272,7 +272,7 @@ for i in u1 u2 u3;do ssh $i 'mkdir -p /opt/bin';done
 tar xf etcd-v3.1.10-linux-amd64.tar.gz -C /tmp/
 #将etcd的运行文件发到相应的服务器上去
 for i in u1 u2 u3;do scp /tmp/etcd-v3.1.10-linux-amd64/etcd* $i:/opt/bin/;done
-
+```
 ##### 定义服务器环境
 ```shell
 export ETCD_NAME=u1.shenmin.com 
@@ -283,6 +283,7 @@ export INTERNAL_IP=192.168.2.31
 sudo mkdir -p /var/lib/etcd
 ```
 ##### 创建启动启动脚本
+```bash
 cat > /lib/systemd/system/etcd.service  <<EOF
 [Unit]
 Description=Etcd Server
@@ -323,4 +324,4 @@ EOF
 ```bash
 systemctl daemon-reload
 systemctl start etcd  
-bash
+```
