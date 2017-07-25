@@ -1118,6 +1118,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   ```
 - 创建heapster-service.yaml
+
 ```yaml
 vim heapster-service.yaml
 apiVersion: v1
