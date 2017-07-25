@@ -6,8 +6,7 @@
 6, [安装k8s master](#安装k8s的master)<br>
 7, [安装k8s node](#安装k8s的node)<br>
 8, [安装dns](#安装dns)<br>
-9, [安装Heapster和dashboard](#安装Heapster和dashboard)<br>
-10,[安装grafana](#安装grafana)<br>
+9, [安装Heapster,dashboard,influxDB,grafana](#安装Heapster和dashboard)<br>
 # 安装环境：
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
