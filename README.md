@@ -1027,7 +1027,7 @@ spec:
             cpu: 10m
       dnsPolicy: Default  # Don't use cluster DNS.
       serviceAccountName: kube-dns
-      ```
+```
 - 然后通过kubectl逐一创建就行，也可以放到一个目录下面，kubectl create -f .批量创建。
 
 ```bash
