@@ -848,5 +848,5 @@ spec:
     port: 53
     protocol: TCP
 ```
-**这个里面注意clusterIP和kubelet里面配置的保存一致即可<br>
+**这个里面注意clusterIP和kubelet里面配置的保存一致即可<br>**
     
