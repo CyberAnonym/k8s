@@ -708,7 +708,7 @@ vim /etc/kubernetes/proxy
 # kubernetes proxy config
 # default config should be adequate
 # Add your own!
-KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
+KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig"
 ```
 - 编写kube-proxy启动文件
 
@@ -797,7 +797,7 @@ metadata:
 - 创建kubedns-sa.yaml
 
 ```yaml
-vimkubedns-sa.yaml
+vim kubedns-sa.yaml
 
 apiVersion: v1
 kind: ServiceAccount
@@ -1039,6 +1039,7 @@ kubectl create -f kubedns-controller.yaml
 起一个pod通过dns验证<br>
 ```yaml
 vim busybox.yaml
+
 apiVersion: v1
 kind: Pod
 metadata:
@@ -1065,8 +1066,7 @@ spec:
 ```yaml
 vim heapster-deployment.yaml
 
-apiVersionheapster-deployment.yaml
-: extensions/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: heapster
@@ -1121,6 +1121,7 @@ roleRef:
 
 ```yaml
 vim heapster-service.yaml
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -1428,7 +1429,7 @@ spec:
 ```yaml
 vim dashboard-service.yaml
 
-piVersion: v1
+apiVersion: v1
 kind: Service
 metadata:
   name: kubernetes-dashboard
