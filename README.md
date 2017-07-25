@@ -771,7 +771,7 @@ systemctl start kube-proxy
 # 安装dns
 - 创建configmap配置文件
 
-```
+```yaml
 vim kubedns-cm.yaml
 # Copyright 2016 The Kubernetes Authors.
 #
