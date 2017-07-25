@@ -1055,4 +1055,398 @@ spec:
     name: busybox
   restartPolicy: Always
   ```
-  然后exec到容器内，执行nslookup kubernetes看能否解析到IP。
+  - 创建busybox
+  ```bash
+  kubectl create -f busybox.yaml
+  ```
+  创建完成之后exec到容器内，执行nslookup kubernetes看能否解析到IP。<br>
+# 安装Heapster和dashboard
+- 创建heapster-deployment.yaml
+
+```yaml
+vim heapster-deployment.yaml
+
+apiVersionheapster-deployment.yaml
+: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: heapster
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        task: monitoring
+        k8s-app: heapster
+    spec:
+      serviceAccountName: heapster
+      containers:
+      - name: heapster
+        image: gcr.io/google_containers/heapster-amd64:v1.3.0-beta.1 
+        imagePullPolicy: IfNotPresent
+        command:
+        - /heapster
+        - --source=kubernetes:https://kubernetes.default
+        - --sink=influxdb:http://monitoring-influxdb:8086
+```
+这个里面source是从kubernetes获取监控对象信息，sink制定数据存储的路径，通过influxdb的api保存数据。上面serviceAccountName是1.6后的rbac准备的。<br>
+
+- 创建heapster-rbac.yaml
+
+```yaml
+vim heapster-rbac.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: heapster
+  namespace: kube-system
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+metadata:
+  name: heapster
+subjects:
+  - kind: ServiceAccount
+    name: heapster
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: system:heapster
+  apiGroup: rbac.authorization.k8s.io
+  ```
+- 创建heapster-service.yaml
+```yaml
+vim heapster-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    task: monitoring
+    # For use as a Cluster add-on (https://github.com/kubernetes/kubernetes/tree/master/cluster/addons)
+    # If you are NOT using this as an addon, you should comment out this line.
+    kubernetes.io/cluster-service: 'true'
+    kubernetes.io/name: Heapster
+  name: heapster
+  namespace: kube-system
+spec:
+  ports:
+  - port: 80
+    targetPort: 8082
+  selector:
+    k8s-app: heapster
+```
+因为dashboard需要访问heapster，所以这里配置service。紧接着是数据库influxdb，先定义配置文件，通过configmap挂载到容器里面。<br>
+- 创建influxdb-cm.yaml
+
+```yaml
+vim influxdb-cm.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+  namespace: kube-system
+data:
+  config.toml: |
+    reporting-disabled = true
+    bind-address = ":8088"
+
+    [meta]
+      dir = "/data/meta"
+      retention-autocreate = true
+      logging-enabled = true
+
+    [data]
+      dir = "/data/data"
+      wal-dir = "/data/wal"
+      query-log-enabled = true
+      cache-max-memory-size = 1073741824
+      cache-snapshot-memory-size = 26214400
+      cache-snapshot-write-cold-duration = "10m0s"
+      compact-full-write-cold-duration = "4h0m0s"
+      max-series-per-database = 1000000
+      max-values-per-tag = 100000
+      trace-logging-enabled = false
+
+    [coordinator]
+      write-timeout = "10s"
+      max-concurrent-queries = 0
+      query-timeout = "0s"
+      log-queries-after = "0s"
+      max-select-point = 0
+      max-select-series = 0
+      max-select-buckets = 0
+
+    [retention]
+      enabled = true
+      check-interval = "30m0s"
+
+    [admin]
+      enabled = true
+      bind-address = ":8083"
+      https-enabled = false
+      https-certificate = "/etc/ssl/influxdb.pem"
+
+    [shard-precreation]
+      enabled = true
+      check-interval = "10m0s"
+      advance-period = "30m0s"
+
+    [monitor]
+      store-enabled = true
+      store-database = "_internal"
+      store-interval = "10s"
+
+    [subscriber]
+      enabled = true
+      http-timeout = "30s"
+      insecure-skip-verify = false
+      ca-certs = ""
+      write-concurrency = 40
+      write-buffer-size = 1000
+
+    [http]
+      enabled = true
+      bind-address = ":8086"
+      auth-enabled = false
+      log-enabled = true
+      write-tracing = false
+      pprof-enabled = false
+      https-enabled = false
+      https-certificate = "/etc/ssl/influxdb.pem"
+      https-private-key = ""
+      max-row-limit = 10000
+      max-connection-limit = 0
+      shared-secret = ""
+      realm = "InfluxDB"
+      unix-socket-enabled = false
+      bind-socket = "/var/run/influxdb.sock"
+
+    [[graphite]]
+      enabled = false
+      bind-address = ":2003"
+      database = "graphite"
+      retention-policy = ""
+      protocol = "tcp"
+      batch-size = 5000
+      batch-pending = 10
+      batch-timeout = "1s"
+      consistency-level = "one"
+      separator = "."
+      udp-read-buffer = 0
+
+    [[collectd]]
+      enabled = false
+      bind-address = ":25826"
+      database = "collectd"
+      retention-policy = ""
+      batch-size = 5000
+      batch-pending = 10
+      batch-timeout = "10s"
+      read-buffer = 0
+      typesdb = "/usr/share/collectd/types.db"
+
+    [[opentsdb]]
+      enabled = false
+      bind-address = ":4242"
+      database = "opentsdb"
+      retention-policy = ""
+      consistency-level = "one"
+      tls-enabled = false
+      certificate = "/etc/ssl/influxdb.pem"
+      batch-size = 1000
+      batch-pending = 5
+      batch-timeout = "1s"
+      log-point-errors = true
+
+    [[udp]]
+      enabled = false
+      bind-address = ":8089"
+      database = "udp"
+      retention-policy = ""
+      batch-size = 5000
+      batch-pending = 10
+      read-buffer = 0
+      batch-timeout = "1s"
+      precision = ""
+
+    [continuous_queries]
+      log-enabled = true
+      enabled = true
+      run-interval = "1s"
+```
+- 创建influxdb-deployment.yaml 
+这个里使用上面的配置文件<br>
+
+```yaml
+vim influxdb-deployment.yaml
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: monitoring-influxdb
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        task: monitoring
+        k8s-app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: gcr.io/google_containers/heapster-influxdb-amd64:v1.1.1
+        volumeMounts:
+        - mountPath: /data
+          name: influxdb-storage
+        - mountPath: /etc/
+          name: influxdb-config
+      volumes:
+      - name: influxdb-storage
+        emptyDir: {}
+      - name: influxdb-config
+        configMap:
+          name: influxdb-config
+```
+
+- 创建influxdb服务，创建一个influxdb-service.yaml文件
+
+```yaml
+vim influxdb-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    task: monitoring
+    # For use as a Cluster add-on (https://github.com/kubernetes/kubernetes/tree/master/cluster/addons)
+    # If you are NOT using this as an addon, you should comment out this line.
+    kubernetes.io/cluster-service: 'true'
+    kubernetes.io/name: monitoring-influxdb
+  name: monitoring-influxdb
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+  - port: 8086
+    targetPort: 8086
+    name: http
+  - port: 8083
+    targetPort: 8083
+    name: admin
+  selector:
+    k8s-app: influxdb
+```
+通过heapster服务地址就可以获取监控数据了。 <br>
+dashboard的安装也是通过yaml文件，设计到调用kubernetes接口权限问题，所以也是一样先授权 <br>
+- 创建dashboard-rbac.yaml
+
+```yaml
+vim dashboard-rbac.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard
+  namespace: kube-system
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+metadata:
+  name: dashboard
+subjects:
+  - kind: ServiceAccount
+    name: dashboard
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+```
+  
+配置了cluster-admin最高访问权限<br>
+- 创建dashboard-controller.yaml
+
+```yaml
+vim dashboard-controller.yaml
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubernetes-dashboard
+  namespace: kube-system
+  labels:
+    k8s-app: kubernetes-dashboard
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kubernetes-dashboard
+  template:
+    metadata:
+      labels:
+        k8s-app: kubernetes-dashboard
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      serviceAccountName: dashboard
+      containers:
+      - name: kubernetes-dashboard
+        image: gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          # keep request = limit to keep this container in guaranteed class
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        ports:
+        - containerPort: 9090
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+```
+配置从外部访问服务需要用到的service <br>
+- 创建dashboard-service.yaml 
+
+```yaml
+vim dashboard-service.yaml
+
+piVersion: v1
+kind: Service
+metadata:
+  name: kubernetes-dashboard
+  namespace: kube-system
+  labels:
+    k8s-app: kubernetes-dashboard
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  type: NodePort 
+  selector:
+    k8s-app: kubernetes-dashboard
+  ports:
+  - port: 80
+    targetPort: 9090
+```
+这里为了从外部访问所以设置NodePort。这样dashboard就可以访问了。<br>
+```bash
+kubectl get svc --namespace=kube-system
+```
+那么就可以通过任意计算节点+端口31508访问服务了<br>
