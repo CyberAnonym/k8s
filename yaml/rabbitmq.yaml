@@ -14,18 +14,18 @@ spec:
       - name: rabbitmq
         resources:
           limits:
-            cpu: 1
-            memory: 200Mi
+            cpu: 2
+            memory: 400Mi
           requests:
             cpu: 0.5
             memory: 100Mi
-        image: test2.shenmin.com:5000/test-env-rabbitmq:latest
+        image: test2.shenmin.com:5000/rabbitmq:1.3
         ports:
         - containerPort: 5672
 #          hostPort: 5000
           protocol: TCP
           name: rabbitmq-port
-        command: [ "/config_rabbitmq.sh" ]
+#        command: [ "/config_rabbitmq.sh" ]
 #        volumeMounts:
 #        - name: registry
 #          mountPath: /var/lib/registry
@@ -42,13 +42,18 @@ metadata:
   name: rabbitmq
   labels:
     run: rabbitmq
-  namespace: 
+  namespace:
 spec:
-#  type: NodePort
+  type: NodePort
   ports:
   - port: 5672
+    name: access-port
     targetPort: 5672
 #    nodePort: 30001
+    protocol: TCP
+  - port: 15672
+    name: web-port
+    targetPort: 15672
     protocol: TCP
   selector:
     run: rabbitmq
