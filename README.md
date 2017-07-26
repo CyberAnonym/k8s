@@ -686,7 +686,7 @@ KUBELET_HOSTNAME="--hostname-override=u1"
 
 # Add your own!
 KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
-EOF
+EOF"
 ```
 - 创建一个kubelet的目录
 
