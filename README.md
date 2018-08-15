@@ -430,7 +430,7 @@ Before=docker.service
 [Service]
 Type=notify
 ExecStart=/opt/bin/flanneld \\
-  --etcd-endpoints="https://k8s1:2379,https://k8s2:2379,https://k8s3:2379" \\
+  --etcd-endpoints="//k8s1:2379,https://k8s2:2379,https://k8s3:2379" \\
   --iface=$IFACE \\
    --etcd-cafile=/etc/kubernetes/ssl/ca.pem \\
   --ip-masq
