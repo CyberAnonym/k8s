@@ -217,7 +217,7 @@ openssl x509  -noout -text -in  kubernetes.pem
  tar xf kubernetes.tar.gz
 ./kubernetes/cluster/get-kube-binaries.sh
 y
-cd /tmp/kubernetes/server/
+cd kubernetes/server/
 tar xf kubernetes-server-linux-amd64.tar.gz
 cd kubernetes/server/bin/
 for i in k8s1 k8s2 k8s3;do ssh $i "mkdir -p /opt/bin";done
