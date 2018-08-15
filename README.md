@@ -10,7 +10,7 @@
 # 安装环境：
 三台服务器，一台master，两台node  ,三台服务器之间已做了ssh免密码登录认证。
 
-#
+k8s.alv.pub enviroment
 
 **三台服务器上都存在的配置**
 ```bash
