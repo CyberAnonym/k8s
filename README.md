@@ -330,6 +330,8 @@ export INTERNAL_IP=192.168.127.94
 - 创建相关目录  
 ```bash
  for i in k8s1 k8s2 k8s3;do ssh $i 'mkdir -p /var/lib/etcd';done
+ for i in k8s1 k8s2 k8s3;do ssh $i 'cp /etc/kubernetes/ssl/* /etc/pki/ca-trust/source/anchors/';done
+
 ```
 - 创建启动启动脚本<br>
 
@@ -372,7 +374,7 @@ EOF
 ```
 - 重新加载服务并启动
 三台服务器最后同时启动。 如果有报错，修改配置后重新启动之前需要先删除旧的数据，否则会有影响 rm -rf /var/lib/etcd/* <br>
-
+如果加如了saltstack，用salt来同时启动  salt 'k8s*' cmd.run 'systemctl start etcd'
 ```bash
 systemctl daemon-reload
 systemctl start etcd
