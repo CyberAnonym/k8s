@@ -16,20 +16,20 @@ k8s.alv.pub enviroment
 ```bash
 cat /etc/hosts
 127.0.0.1	localhost
-192.168.2.31 u1.shenmin.com u1
-192.168.2.32 u2.shenmin.com u2
-192.168.2.33 u3.shenmin.com u3
+192.168.127.94 k8s1.alv.pub k8s1
+192.168.127.95 k8s2.alv.pub k8s2
+192.168.127.96 k8s3.alv.pub k8s3
 ```
 - 三台服务器系统版本都是ubuntu16.06。<br>
 **master服务器信息** <br>
-Hostname: os1.shenmin.com<br>
-IP: 192.168.2.31<br>
+Hostname: k8s1.alv.pub<br>
+IP: 192.168.127.94<br>
 **node1服务器信息**  
-Hostname: os2.shenmin.com  
-IP: 192.168.2.32  
+Hostname: k8s2.alv.pub
+IP: 192.168.127.95
 **node2服务器信息**  
-Hostname: os3.shenmin.com  
-IP: 192.168.2.33  
+Hostname: k8s3.alv.pub
+IP: 192.168.127.96
 
 
 # 创建证书
@@ -109,13 +109,13 @@ vim kubernetes-csr.json
   "CN": "kubernetes",
   "hosts": [
     "127.0.0.1",
-    "192.168.2.31",
-    "192.168.2.32",
-    "192.168.2.33",
+    "192.168.127.94",
+    "192.168.127.95",
+    "192.168.127.96",
     "172.18.0.1",
-    "u1",
-    "u2",
-    "u3",
+    "k8s1",
+    "k8s2",
+    "k8s3",
     "kubernetes",
     "kubernetes.default",
     "kubernetes.default.svc",
@@ -201,8 +201,8 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 
 秘钥分发
 ```bash
-for i in u1 u2 u3;do ssh  $i 'mkdir -p /etc/kubernetes/ssl';done
-for i in u1 u2 u3;do scp *.pem  $i:/etc/kubernetes/ssl;done
+for i in k8s1 k8s2 k8s3;do ssh  $i 'mkdir -p /etc/kubernetes/ssl';done
+for i in k8s1 k8s2 k8s3;do scp *.pem  $i:/etc/kubernetes/ssl;done
 ```
 查看验证证书
 openssl x509  -noout -text -in  kubernetes.pem
@@ -220,9 +220,9 @@ y
 cd /tmp/kubernetes/server/
 tar xf kubernetes-server-linux-amd64.tar.gz
 cd kubernetes/server/bin/
-for i in u1 u2 u3;do ssh $i "mkdir -p /opt/bin";done
-for i in u1 u2 u3;do scp kube-apiserver kube-controller-manager kube-scheduler $i:/opt/bin/;done
-for i in u1 u2 u3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
+for i in k8s1 k8s2 k8s3;do ssh $i "mkdir -p /opt/bin";done
+for i in k8s1 k8s2 k8s3;do scp kube-apiserver kube-controller-manager kube-scheduler $i:/opt/bin/;done
+for i in k8s1 k8s2 k8s3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
 ```
 
 创建 TLS Bootstrapping Token<br>
@@ -237,12 +237,12 @@ EOF
 后三行是一句，直接复制上面的脚本运行即可。<br>
 将token.csv发到所有机器（Master 和 Node）的 /etc/kubernetes/ 目录。<br>
 ```bash
-for i in u1 u2 u3;do scp token.csv  $i:/etc/kubernetes;done
+for i in k8s1 k8s2 k8s3;do scp token.csv  $i:/etc/kubernetes;done
 ```
 ##### 创建 Kubelet Bootstrapping Kubeconfig 文件<br>
 ```bash
 cd /etc/kubernetes
-export KUBE_APISERVER="https://192.168.2.31:6443"
+export KUBE_APISERVER="https://192.168.127.94:6443"
 echo 'export PATH=$PATH:/opt/bin ' >> /etc/profile
 source /etc/profile
 # 设置集群参数
@@ -268,7 +268,7 @@ kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
 - 创建Kube-Proxy Kubeconfig 文件
  
 ```bash
-export KUBE_APISERVER="https://192.168.2.31:6443"
+export KUBE_APISERVER="https://192.168.127.94:6443"
 # 设置集群参数
  kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
@@ -296,7 +296,7 @@ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 将两个 kubeconfig 文件分发到所有 Node 机器的 /etc/kubernetes/ 目录<br>
 
 ```bash
-for i in u1 u2 u3;do scp bootstrap.kubeconfig kube-proxy.kubeconfig  $i:/etc/kubernetes/;done
+for i in k8s1 k8s2 k8s3;do scp bootstrap.kubeconfig kube-proxy.kubeconfig  $i:/etc/kubernetes/;done
 ```
 # 安装etcd服务
 **下载etcd**
@@ -308,7 +308,7 @@ wget https://github.com/coreos/etcd/releases/download/v3.1.10/etcd-v3.1.10-linux
 - 创建用于存放服务文件的的目录
  
 ```bash
-for i in u1 u2 u3;do ssh $i 'mkdir -p /opt/bin';done
+for i in k8s1 k8s2 k8s3;do ssh $i 'mkdir -p /opt/bin';done
 ```
 - 解压etcd安装包到/tmp目录
 
@@ -318,18 +318,18 @@ tar xf etcd-v3.1.10-linux-amd64.tar.gz -C /tmp/
 - 将etcd的运行文件发到相应的服务器上去
 
 ```bash
-for i in u1 u2 u3;do scp /tmp/etcd-v3.1.10-linux-amd64/etcd* $i:/opt/bin/;done
+for i in k8s1 k8s2 k8s3;do scp /tmp/etcd-v3.1.10-linux-amd64/etcd* $i:/opt/bin/;done
 ```
 - 定义服务器环境
 - 以下配置在三台服务器上都做，ETCD_NAME和IP分别写每台服务器自己的。
 ```bash
-export ETCD_NAME=u1 
-export INTERNAL_IP=192.168.2.31  
+export ETCD_NAME=k8s1
+export INTERNAL_IP=192.168.127.94
 ```
 
 - 创建相关目录  
 ```bash
- for i in u1 u2 u3;do ssh $i 'mkdir -p /var/lib/etcd';done
+ for i in k8s1 k8s2 k8s3;do ssh $i 'mkdir -p /var/lib/etcd';done
 ```
 - 创建启动启动脚本<br>
 
@@ -359,7 +359,7 @@ ExecStart=/opt/bin/etcd \\
   --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
   --advertise-client-urls https://${INTERNAL_IP}:2379 \\
   --initial-cluster-token etcd-cluster-0 \\
-  --initial-cluster u1=https://u1:2380,u2=https://u2:2380,u3=https://u3:2380 \\
+  --initial-cluster k8s1=https://k8s1:2380,k8s2=https://k8s2:2380,k8s3=https://k8s3:2380 \\
   --initial-cluster-state new \\
   --data-dir=/var/lib/etcd
 Restart=on-failure
@@ -386,7 +386,7 @@ systemctl start etcd
   --ca-file=/etc/kubernetes/ssl/ca.pem \
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \
   --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
- --endpoint=https://u1:2379  cluster-health
+ --endpoint=https://k8s1:2379  cluster-health
 ```
 - 接下来要为k8s提供服务，这里我们尝试为k8s创建一个目录 <br>
 
@@ -395,7 +395,7 @@ systemctl start etcd
   --ca-file=/etc/kubernetes/ssl/ca.pem \
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \
   --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
-  --endpoint=https://u1:2379,https://u2:2379,https://u3:2379 \
+  --endpoint=https://k8s1:2379,https://k8s2:2379,https://k8s3:2379 \
   mk /coreos.com/network/config '{"Network":"192.168.0.0/16", "Backend": {"Type": "vxlan"}}'
 ```
 # 安装配置flanneld服务
@@ -410,12 +410,12 @@ flannel的历史版本在这里 https://github.com/coreos/flannel/releases <br>
 ```bash
 tar xf flannel-v0.8.0-linux-amd64.tar.gz -C /tmp/
 cd /tmp/
-for i in u1 u2 u3;do scp flanneld $i:/opt/bin/;done
+for i in k8s1 k8s2 k8s3;do scp flanneld $i:/opt/bin/;done
 ```
 这里我们用systemd来管理flanneld， </br>
 
 ```bash
-IFACE=192.168.2.31
+IFACE=192.168.127.94
 cat > /lib/systemd/system/flanneld.service << EOF
 [Unit]
 Description=Flanneld overlay address etcd agent
@@ -428,7 +428,7 @@ Before=docker.service
 [Service]
 Type=notify
 ExecStart=/opt/bin/flanneld \\
-  --etcd-endpoints="https://u1:2379,https://u2:2379,https://u3:2379" \\
+  --etcd-endpoints="https://k8s1:2379,https://k8s2:2379,https://k8s3:2379" \\
   --iface=$IFACE \\
    --etcd-cafile=/etc/kubernetes/ssl/ca.pem \\
   --ip-masq
@@ -490,7 +490,7 @@ vim /etc/kubernetes/apiserver
 #
 ## The address on the local server to listen to.
 #KUBE_API_ADDRESS="--insecure-bind-address=sz-pg-oam-docker-test-001.tendcloud.com"
-KUBE_API_ADDRESS="--advertise-address=192.168.2.31 --bind-address=192.168.2.31 --insecure-bind-address=127.0.0.1"
+KUBE_API_ADDRESS="--advertise-address=192.168.127.94 --bind-address=192.168.127.94 --insecure-bind-address=127.0.0.1"
 #
 ## The port on the local server to listen on.
 #KUBE_API_PORT="--port=8080"
@@ -499,7 +499,7 @@ KUBE_API_ADDRESS="--advertise-address=192.168.2.31 --bind-address=192.168.2.31 -
 #KUBELET_PORT="--kubelet-port=10250"
 #
 ## Comma separated list of nodes in the etcd cluster
-KUBE_ETCD_SERVERS="--etcd-servers=https://u1:2379,https://u2:2379,https://u3:2379"
+KUBE_ETCD_SERVERS="--etcd-servers=https://k8s1:2379,https://k8s2:2379,https://k8s3:2379"
 #
 ## Address range to use for services
 KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=172.18.0.0/16"
@@ -630,7 +630,7 @@ systemctl start kube-scheduler
 - 确认各个组件的状态是否都是正常运行。
 
 ```bash
-root@u1:~# kubectl get cs
+root@k8s1:~# kubectl get cs
 NAME                 STATUS    MESSAGE              ERROR
 scheduler            Healthy   ok                   
 controller-manager   Healthy   ok                   
@@ -661,7 +661,7 @@ KUBE_LOG_LEVEL="--v=0"
 KUBE_ALLOW_PRIV="--allow-privileged=true"
 
 # How the controller-manager, scheduler, and proxy find the apiserver
-KUBE_MASTER="--master=https://u1:6443"
+KUBE_MASTER="--master=https://k8s1:6443"
 ```
 - 编写kubelet的配置文件
 
@@ -678,10 +678,10 @@ KUBELET_ADDRESS="--address=0.0.0.0"
 # KUBELET_PORT="--port=10250"
 
 # You may leave this blank to use the actual hostname
-KUBELET_HOSTNAME="--hostname-override=u1"
+KUBELET_HOSTNAME="--hostname-override=k8s1"
 
 # location of the api-server
-#KUBELET_API_SERVER="--api-servers=http://192.168.2.31:8080"
+#KUBELET_API_SERVER="--api-servers=http://192.168.127.94:8080"
 
 # pod infrastructure container
 # KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
@@ -728,7 +728,7 @@ vim /etc/kubernetes/proxy
 # kubernetes proxy config
 # default config should be adequate
 # Add your own!
-KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=172.18.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
+KUBE_PROXY_ARGS="--bind-address=192.168.127.95 --hostname-override=k8s2 --proxy-mode=iptables --cluster-cidr=172.18.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
 ```
 - 编写kube-proxy启动文件
 
@@ -768,14 +768,14 @@ systemctl start kubelet
 下面是示例<br>
 
 ```bash
-root@u1:~# kubectl get csr
+root@k8s1:~# kubectl get csr
 NAME        AGE       REQUESTOR           CONDITION
 csr-qdn47   14s       kubelet-bootstrap   Pending
-root@u1:~# kubectl certificate approve csr-qdn47
+root@k8s1:~# kubectl certificate approve csr-qdn47
 certificatesigningrequest "csr-qdn47" approved
-root@u1:~# kubectl get node
+root@k8s1:~# kubectl get node
 NAME      STATUS    AGE       VERSION
-u2        Ready     30s       v1.6.2
+k8s2        Ready     30s       v1.6.2
 
 #然后kubelet 那边就注册成功了。
 ```

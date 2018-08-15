@@ -36,7 +36,7 @@ kubectl config use-context default --kubeconfig=kubelet.kubeconfig
 
 cd /etc/kubernetes/
 export BOOTSTRAP_TOKEN=1ac6fd59506cba11ffc4a74d98f5df9e
-export KUBE_APISERVER="https://192.168.2.31:6443"
+export KUBE_APISERVER="https://192.168.127.94:6443"
 
  kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
@@ -93,7 +93,7 @@ KUBE_LOG_LEVEL="--v=0"
 KUBE_ALLOW_PRIV="--allow-privileged=true"
 
 # How the controller-manager, scheduler, and proxy find the apiserver
-KUBE_MASTER="--master=https://192.168.2.31:6443"
+KUBE_MASTER="--master=https://192.168.127.94:6443"
 ```
 然后是kubelet的config<br>
 ```
@@ -108,10 +108,10 @@ KUBELET_ADDRESS="--address=0.0.0.0"
 # KUBELET_PORT="--port=10250"
 
 # You may leave this blank to use the actual hostname
-KUBELET_HOSTNAME="--hostname-override=u1"
+KUBELET_HOSTNAME="--hostname-override=k8s1"
 
 # location of the api-server
-#KUBELET_API_SERVER="--api-servers=http://192.168.2.31:8080"
+#KUBELET_API_SERVER="--api-servers=http://192.168.127.94:8080"
 
 # pod infrastructure container
 KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
@@ -155,7 +155,7 @@ vim /etc/kubernetes/proxy
 # kubernetes proxy config
 # default config should be adequate
 # Add your own!
-KUBE_PROXY_ARGS="--bind-address=192.168.2.32 --hostname-override=u2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
+KUBE_PROXY_ARGS="--bind-address=192.168.127.95 --hostname-override=k8s2 --proxy-mode=iptables --cluster-cidr=192.168.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
 ```
 
 vim /lib/systemd/system/kube-proxy.service 

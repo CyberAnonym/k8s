@@ -4,7 +4,7 @@
 # 高可用master安装。
 1. [test](#3.2kube-controller-manager)
 
-export KUBE_APISERVER="https://192.168.2.31:6443"
+export KUBE_APISERVER="https://192.168.127.94:6443"
 
 kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
@@ -58,7 +58,7 @@ KUBE_LOG_LEVEL="--v=0"
 KUBE_ALLOW_PRIV="--allow-privileged=false"
 
 # How the controller-manager, scheduler, and proxy find the apiserver
-KUBE_MASTER="--master=http://192.168.2.31:8080"
+KUBE_MASTER="--master=http://192.168.127.94:8080"
 ```
 ### 配置文件
 **vim /etc/kubernetes/apiserver**
@@ -72,7 +72,7 @@ KUBE_MASTER="--master=http://192.168.2.31:8080"
 #
 ## The address on the local server to listen to.
 #KUBE_API_ADDRESS="--insecure-bind-address=sz-pg-oam-docker-test-001.tendcloud.com"
-KUBE_API_ADDRESS="--advertise-address=192.168.2.31 --bind-address=192.168.2.31 --insecure-bind-address=0.0.0.0"
+KUBE_API_ADDRESS="--advertise-address=192.168.127.94 --bind-address=192.168.127.94 --insecure-bind-address=0.0.0.0"
 #
 ## The port on the local server to listen on.
 #KUBE_API_PORT="--port=8080"
@@ -81,7 +81,7 @@ KUBE_API_ADDRESS="--advertise-address=192.168.2.31 --bind-address=192.168.2.31 -
 #KUBELET_PORT="--kubelet-port=10250"
 #
 ## Comma separated list of nodes in the etcd cluster
-KUBE_ETCD_SERVERS="--etcd-servers=https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379"
+KUBE_ETCD_SERVERS="--etcd-servers=https://k8s1.alv.pub:2379,https://k8s2.alv.pub:2379,https://k8s3.alv.pub:2379"
 #
 ## Address range to use for services
 KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=172.18.0.0/16"
@@ -210,7 +210,7 @@ cd /tmp/kubernetes/server/
 tar xf kubernetes-server-linux-amd64.tar.gz
 cd kubernetes/server/bin/
 cp kube-apiserver kube-controller-manager kube-scheduler /opt/bin/
-for i in u1 u2 u3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
+for i in k8s1 k8s2 k8s3;do scp kubelet kubectl kube-proxy $i:/opt/bin;done
 ```
 ### 4. 服务启动
 ```
@@ -224,7 +224,7 @@ systemctl start kube-scheduler
 ```
 #### 然后看一下各个组件的状态是否都是正常运行着了。
 ```
-root@u1:~# kubectl get cs
+root@k8s1:~# kubectl get cs
 NAME                 STATUS    MESSAGE              ERROR
 scheduler            Healthy   ok                   
 controller-manager   Healthy   ok                   

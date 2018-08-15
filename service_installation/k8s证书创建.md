@@ -65,8 +65,8 @@ cfssl gencert -initca ca-csr.json | cfssljson -bare ca
   "hosts": [
     "127.0.0.1",
     "172.18.0.1",
-    "192.168.2.31",
-    "u1.shenmin.com",
+    "192.168.127.94",
+    "k8s1.alv.pub",
     "kubernetes",
     "kubernetes.default",
     "kubernetes.default.svc",
@@ -144,6 +144,6 @@ cp *.pem /etc/kubernetes/ssl
 
 查看验证证书
 openssl x509  -noout -text -in  kubernetes.pem
-for i in u1 u2 u3;do ssh  $i 'mkdir -p /etc/kubernetes/ssl';done
-for i in u1 u2 u3;do scp *.pem  $i:/etc/kubernetes/ssl;done
+for i in k8s1 k8s2 k8s3;do ssh  $i 'mkdir -p /etc/kubernetes/ssl';done
+for i in k8s1 k8s2 k8s3;do scp *.pem  $i:/etc/kubernetes/ssl;done
 ```

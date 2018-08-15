@@ -17,7 +17,7 @@ $cp token.csv /etc/kubernetes/
 
 创建 Kubelet Bootstrapping Kubeconfig 文件
 $ cd /etc/kubernetes
-$ export KUBE_APISERVER="https://192.168.2.31:6443
+$ export KUBE_APISERVER="https://192.168.127.94:6443
 $ # 设置集群参数
 $ kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
@@ -39,7 +39,7 @@ $ kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
   ● --embed-certs 为 true 时表示将 certificate-authority 证书写入到生成的 bootstrap.kubeconfig 文件中；
   ● 设置客户端认证参数时没有指定秘钥和证书，后续由 kube-apiserver 自动生成；
 创建 Kube-Proxy Kubeconfig 文件
-$ export KUBE_APISERVER="https://192.168.2.31:6443"
+$ export KUBE_APISERVER="https://192.168.127.94:6443"
 $ # 设置集群参数
 $ kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
@@ -66,7 +66,7 @@ $ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 将两个 kubeconfig 文件分发到所有 Node 机器的 /etc/kubernetes/ 目录
 $ cp bootstrap.kubeconfig kube-proxy.kubeconfig /etc/kubernetes/
 
-root@u1:/samba/packages/linux/docker_images/config# ll
+root@k8s1:/samba/packages/linux/docker_images/config# ll
 total 6144
 drwxr-xr-x+ 2 99 99    0 Jul 20 19:24 ./
 drwx------+ 6 99 99    0 Jul 19 14:27 ../
@@ -76,7 +76,7 @@ drwx------+ 6 99 99    0 Jul 19 14:27 ../
 -rw-r--r--+ 1 99 99  934 Jul 20 19:24 kubelet
 -rw-------+ 1 99 99 6284 Jul 19 20:13 kube-proxy.kubeconfig
 -rw-r--r--+ 1 99 99   84 Jul 19 18:09 token.csv
-root@u1:/samba/packages/linux/docker_images/config# for i in u1 u2 u3;do scp *  $i:/etc/kubernetes/ ';done
+root@k8s1:/samba/packages/linux/docker_images/config# for i in k8s1 k8s2 k8s3;do scp *  $i:/etc/kubernetes/ ';done
 
 
 ```

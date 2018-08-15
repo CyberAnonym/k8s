@@ -2,8 +2,8 @@
 参考：http://rootsongjc.github.io/blogs/kubernetes-etcd-ha-config/
 #### 定义服务器环境
 ```shell
-export ETCD_NAME=u1.shenmin.com 
-export INTERNAL_IP=192.168.2.31  
+export ETCD_NAME=k8s1.alv.pub
+export INTERNAL_IP=192.168.127.94
 ```
 #### 创建相关目录  
 ```bash
@@ -33,7 +33,7 @@ ExecStart=/opt/bin/etcd \\
   --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
   --advertise-client-urls https://${INTERNAL_IP}:2379 \\
   --initial-cluster-token etcd-cluster-0 \\
-  --initial-cluster u1.shenmin.com=https://u1.shenmin.com:2380,u2.shenmin.com=https://u2.shenmin.com:2380,u3.shenmin.com=https://u3.shenmin.com:2380 \\
+  --initial-cluster k8s1.alv.pub=https://k8s1.alv.pub:2380,k8s2.alv.pub=https://k8s2.alv.pub:2380,k8s3.alv.pub=https://k8s3.alv.pub:2380 \\
   --initial-cluster-state new \\
   --data-dir=/var/lib/etcd
 Restart=on-failure
@@ -54,7 +54,7 @@ systemctl start etcd
   --ca-file=/etc/kubernetes/ssl/ca.pem \
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \
   --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
- --endpoint=https://u1.shenmin.com:2379  cluster-health
+ --endpoint=https://k8s1.alv.pub:2379  cluster-health
  
  如果是要为k8s提供服务，这里我们尝试为k8s创建一个目录  
  
@@ -62,6 +62,6 @@ systemctl start etcd
   --ca-file=/etc/kubernetes/ssl/ca.pem \
   --cert-file=/etc/kubernetes/ssl/kubernetes.pem \
   --key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
-  --endpoint=https://u1.shenmin.com:2379,https://u2.shenmin.com:2379,https://u3.shenmin.com:2379 \
+  --endpoint=https://k8s1.alv.pub:2379,https://k8s2.alv.pub:2379,https://k8s3.alv.pub:2379 \
   mk /coreos.com/network/config '{"Network":"192.168.0.0/16", "Backend": {"Type": "vxlan"}}'
 ```
