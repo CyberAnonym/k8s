@@ -229,7 +229,7 @@ openssl x509  -noout -text -in  kubernetes.pem
 #下载软件
 
  ```bash
- wget https://github.com/kubernetes/kubernetes/releases/download/v1.6.2/kubernetes.tar.gz
+ wget https://github.com/kubernetes/kubernetes/releases/download/v1.11.2/kubernetes.tar.gz
  tar xf kubernetes.tar.gz
 ./kubernetes/cluster/get-kube-binaries.sh
 y
