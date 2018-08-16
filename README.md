@@ -712,7 +712,7 @@ mkdir -p /var/lib/kubelet
 - 编写kubelet服务启动文件
 
 ```bash
-vim /lib/systemd/system/kubelet.service
+echo '
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -734,22 +734,24 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+' > /lib/systemd/system/kubelet.service
 ```
 - 编写kube-proxy的配置文件
 
 ```bash
-vim /etc/kubernetes/proxy
+echo '
 # kubernetes proxy config
 # default config should be adequate
 # Add your own!
 KUBE_PROXY_ARGS="--bind-address=192.168.127.95 --hostname-override=k8s2 --proxy-mode=iptables --cluster-cidr=172.18.0.0/16 --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
+' > /etc/kubernetes/proxy
 ```
 - 编写kube-proxy启动文件
 
 
 
 ```bash
-vim /lib/systemd/system/kube-proxy.service
+echo '
 [Unit]
 Description=Kubernetes Kube-Proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -769,6 +771,7 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
+' > /lib/systemd/system/kube-proxy.service
 ```
 - 启动kubelet
 
@@ -803,7 +806,7 @@ systemctl start kube-proxy
 - 创建configmap配置文件
 
 ```yaml
-vim kubedns-cm.yaml
+echo '
 # Copyright 2016 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -825,11 +828,12 @@ metadata:
   namespace: kube-system
   labels:
     addonmanager.kubernetes.io/mode: EnsureExists
+' > kubedns-cm.yaml
 ```
 - 创建kubedns-sa.yaml
 
 ```yaml
-vim kubedns-sa.yaml
+echo '
 
 apiVersion: v1
 kind: ServiceAccount
@@ -839,6 +843,7 @@ metadata:
   labels:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
+' > kubedns-sa.yaml
 ```
 - 创建kubedns-svc.yaml
 
