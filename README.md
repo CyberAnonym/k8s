@@ -31,6 +31,11 @@ IP: 192.168.127.95
 Hostname: k8s3.alv.pub
 IP: 192.168.127.96
 
+# 安装docker
+
+```
+yum install docker -y
+```
 
 # 创建证书
 创建证书部分参考地址：http://blog.csdn.net/u010278923/article/details/71082349
