@@ -460,6 +460,13 @@ curl -s https://raw.githubusercontent.com/AlvinWanCN/poppy/master/code/shell/k8s
 - 编写配置文件
 - 公共配置文件<br>
 
+先设置证书权限允许kube读取
+
+```
+id kube || useradd kube -s /sbin/nologin
+setfacl -m u:kube:r /etc/kubernetes/ssl/ca-key.pem
+```
+
 ```bash
 vim /etc/kubernetes/config
 ###
@@ -695,7 +702,7 @@ KUBELET_HOSTNAME="--hostname-override=k8s1"
 
 # Add your own!
 KUBELET_ARGS=" --cluster-dns=172.18.8.8 --cluster-domain=cluster.local --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl"
-EOF"
+EOF
 ```
 - 创建一个kubelet的目录
 
