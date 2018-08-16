@@ -36,6 +36,13 @@ IP: 192.168.127.96
 
 yum install docker -y
 
+ssh-keygen
+
+ssh-copy-id k8s1
+
+ssh-copy-id k8s2
+
+ssh-copy-id k8s3
 
 # 创建证书
 创建证书部分参考地址：http://blog.csdn.net/u010278923/article/details/71082349
