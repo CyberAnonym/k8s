@@ -128,6 +128,9 @@ vim kubernetes-csr.json
     "k8s1",
     "k8s2",
     "k8s3",
+    "k8s1.alv.pub",
+    "k8s2.alv.pub",
+    "k8s3.alv.pub",
     "kubernetes",
     "kubernetes.default",
     "kubernetes.default.svc",
@@ -148,6 +151,7 @@ vim kubernetes-csr.json
     }
   ]
 }
+
 ```
 
 这个里面配置的IP，是使用该证书机器的IP，根据自己的环境填写其中172.18.0.1是kubernetes自带的service，执行生成命令<br>
