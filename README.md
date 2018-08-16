@@ -848,7 +848,7 @@ metadata:
 - 创建kubedns-svc.yaml
 
 ```yaml
-vim kubedns-svc.yaml
+echo '
 # Copyright 2016 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -886,12 +886,13 @@ spec:
   - name: dns-tcp
     port: 53
     protocol: TCP
+' > kubedns-svc.yaml
 ```
 **这个里面注意clusterIP和kubelet里面配置的保持一致即可<br>**
 - 创建kubedns-controller.yaml
 
 ```yaml
-vim kubedns-controller.yaml
+echo '
 # Copyright 2016 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1063,6 +1064,7 @@ spec:
             cpu: 10m
       dnsPolicy: Default  # Don't use cluster DNS.
       serviceAccountName: kube-dns
+' > kubedns-controller.yaml
 ```
 - 然后通过kubectl逐一创建就行，也可以放到一个目录下面，kubectl create -f .批量创建。
 
