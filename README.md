@@ -393,6 +393,7 @@ EOF
 如果加如了saltstack，用salt来同时启动  salt 'k8s*' cmd.run 'systemctl start etcd'
 ```bash
 systemctl daemon-reload
+systemctl enable etcd
 systemctl start etcd
 ```
 - 在三台服务器都配置、启动好了etcd之后，我们可以来检查一下ETCD是否正常运行。
@@ -461,6 +462,7 @@ EOF
 
 ```bash
 systemctl daemon-reload
+systemctl enable flanneld.service
 systemctl start flanneld.service 
 ```
 - 然后我们需要让docker的网段与flanneld的一样，执行下面的命令。
@@ -646,10 +648,11 @@ WantedBy=multi-user.target
 ```
 systemctl daemon-reload
 systemctl enable kube-apiserver
-systemctl start kube-apiserver
 systemctl enable kube-controller-manager
-systemctl start kube-controller-manager
 systemctl enable kube-scheduler
+
+systemctl start kube-apiserver
+systemctl start kube-controller-manager
 systemctl start kube-scheduler
 ```
 - 确认各个组件的状态是否都是正常运行。
