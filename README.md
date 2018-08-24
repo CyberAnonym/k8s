@@ -1073,10 +1073,11 @@ spec:
     name: busybox
   restartPolicy: Always
   ```
-  - 创建busybox
-  ```bash
-  kubectl create -f busybox.yaml
-  ```
+- 创建busybox
+
+```bash
+kubectl create -f busybox.yaml
+```
   创建完成之后exec到容器内，执行nslookup kubernetes看能否解析到IP。<br>
   
 # 安装Heapster,dashboard,influxDB,grafana
