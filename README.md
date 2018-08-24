@@ -1055,6 +1055,7 @@ kubectl create -f kubedns-controller.yaml
 ```
 - 然后验证
 起一个pod通过dns验证<br>
+
 ```yaml
 vim busybox.yaml
 apiVersion: v1
@@ -1077,6 +1078,7 @@ spec:
   kubectl create -f busybox.yaml
   ```
   创建完成之后exec到容器内，执行nslookup kubernetes看能否解析到IP。<br>
+  
 # 安装Heapster,dashboard,influxDB,grafana
 - 创建heapster-deployment.yaml
 
