@@ -1111,7 +1111,7 @@ spec:
 
  - 创建busybox
 
- ```bash
+```bash
 kubectl create -f busybox.yaml
 ```
 
@@ -1122,8 +1122,7 @@ kubectl create -f busybox.yaml
 ```yaml
 vim heapster-deployment.yaml
 
-apiVersionheapster-deployment.yaml
-: extensions/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: heapster
