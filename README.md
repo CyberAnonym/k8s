@@ -1090,6 +1090,7 @@ kubectl create -f kubedns-controller.yaml
 ```
 - 然后验证
 起一个pod通过dns验证<br>
+
 ```yaml
 vim busybox.yaml
 apiVersion: v1
@@ -1106,7 +1107,7 @@ spec:
     imagePullPolicy: IfNotPresent
     name: busybox
   restartPolicy: Always
-  ```
+```
 
  - 创建busybox
 
